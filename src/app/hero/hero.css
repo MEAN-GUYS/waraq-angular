@@ -1,0 +1,115 @@
+.hero {
+  background: linear-gradient(135deg, #0d1b35 0%, #1a2a4a 50%, #0f2040 100%);
+  padding: 90px 80px;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content:space-around;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 168, 76, 0.08);
+  top: -100px;
+  right: 200px;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 168, 76, 0.05);
+  bottom: -80px;
+  right: 300px;
+}
+
+.hero-content {
+  max-width: 500px;
+  z-index: 1;
+}
+
+.label {
+  color: #c9a84c;
+  font-size: 17px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+h1 {
+  color: #ffffff;
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 0 0 20px 0;
+}
+
+p {
+  color: #8fa3c0;
+  font-size: 20px;
+  line-height: 1.7;
+  margin: 0 0 36px 0;
+  max-width: 370px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.btn-primary {
+  background-color: #c9a84c;
+  color: #0d1b35;
+  border: none;
+  padding: 14px 28px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: #b8973d;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  padding: 14px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-secondary:hover {
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.07);
+  transform: translateY(-2px);
+}
+
+.hero-image img {
+  width: 470px;
+  object-fit: contain;
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-50px); }
+  100% { transform: translateY(0px); }
+}
