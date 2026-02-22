@@ -1,0 +1,15 @@
+<app-hero />
+<section class="py-10 px-8 bg-gray-50">
+  <div class="flex justify-between items-start mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Popular Books</h1>
+      <p class="text-gray-400 text-sm">Most loved by our readers this month</p>
+    </div>
+    <a class="text-amber-700 text-sm font-medium cursor-pointer hover:underline">View All →</a>
+  </div>
+  <div class="flex gap-6 overflow-x-auto pb-4">
+    @for (book of topRateBooks; track book.id) {
+      <app-book-card [book]="book" />
+    }
+  </div>
+</section>
