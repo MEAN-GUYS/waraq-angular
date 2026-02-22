@@ -1,8 +1,11 @@
 import { Routes } from '@angular/router';
-import { HeroComponent } from './hero/hero';
+import { HomePage } from './components/home-page/home-page';
+import { Registration } from './components/registration/registration';
 import { CartComponent } from './cart/cart';
 
 export const routes: Routes = [
-  { path: '', component: HeroComponent },
-  { path: 'cart', component: CartComponent }
+    {path : ""  ,component : HomePage},
+   //{path : "books"  ,component : BooksPage},*/
+    {path: "register" , component: Registration}, 
+    { path: 'cart', component: CartComponent }
 ];
