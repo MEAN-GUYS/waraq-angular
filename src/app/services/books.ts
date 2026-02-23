@@ -15,7 +15,8 @@ export default class BooksService {
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
+        const isPrimitive = ['string', 'number', 'boolean'].includes(typeof value);
+        if (value !== undefined && value !== null && isPrimitive) {
           httpParams = httpParams.set(key, String(value));
         }
       });
