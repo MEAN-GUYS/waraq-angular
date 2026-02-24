@@ -9,3 +9,4 @@ export const routes: Routes = [
     {path: "register" , component: Registration}, 
     { path: 'cart', component: CartComponent }
 ];
+ 
