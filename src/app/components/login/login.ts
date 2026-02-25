@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { LoginPayload } from '../../models/registration';
 
@@ -19,6 +19,7 @@ export class Login {
     constructor(
         private fb: FormBuilder,
         private authService: AuthService,
+        private route: ActivatedRoute,
         private router: Router,
         private cdr: ChangeDetectorRef
     ) {
@@ -48,7 +49,9 @@ export class Login {
         this.authService.login(payload).subscribe({
             next: () => {
                 this.loading = false;
-                this.router.navigate(['/']);
+                const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+                const safeReturnUrl = returnUrl && returnUrl.startsWith('/') ? returnUrl : '/';
+                this.router.navigateByUrl(safeReturnUrl);
                 this.cdr.detectChanges();
             },
             error: (err) => {

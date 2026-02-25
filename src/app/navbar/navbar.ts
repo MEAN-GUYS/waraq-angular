@@ -1,30 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { map } from 'rxjs';
 import { AuthService } from '../services/auth-service';
+import { CartService } from '../services/cart.service';
 import { User } from '../models/registration';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, AsyncPipe],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css'
 })
-export class NavbarComponent implements OnInit {
-  isLoggedIn = false;
-  user: User | null = null;
+export class NavbarComponent {
+  readonly authService = inject(AuthService);
+  private readonly cartService = inject(CartService);
+  private readonly router = inject(Router);
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) { }
-
-  ngOnInit(): void {
-    this.authService.isLoggedIn$.subscribe((loggedIn) => {
-      this.isLoggedIn = loggedIn;
-      this.user = this.authService.getUser();
-    });
-  }
+  readonly isLoggedIn$ = this.authService.isLoggedIn$;
+  readonly user$ = this.isLoggedIn$.pipe(
+    map((loggedIn): User | null => (loggedIn ? this.authService.getUser() : null))
+  );
+  readonly cartCount$ = this.cartService.count$;
 
   logout(): void {
     this.authService.logout().subscribe({

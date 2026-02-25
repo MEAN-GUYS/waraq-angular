@@ -30,7 +30,6 @@ export class Registration {
         firstName: ['', [Validators.required, Validators.minLength(3)]],
         lastName: ['', [Validators.required, Validators.minLength(3)]],
         email: ['', [Validators.required, this.validators.emailValidator()]],
-        dateOfBirth: ['', Validators.required],
         password: ['', [Validators.required, this.validators.passwordStrengthValidator()]],
         confirmPassword: ['', Validators.required],
       },

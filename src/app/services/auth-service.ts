@@ -83,6 +83,10 @@ export class AuthService {
     return raw ? JSON.parse(raw) : null;
   }
 
+  getRole(): string | null {
+    return this.getUser()?.role ?? null;
+  }
+
   clearTokens(): void {
     if (!this.isBrowser) return;
     localStorage.removeItem(this.ACCESS_TOKEN_KEY);
