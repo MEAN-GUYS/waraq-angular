@@ -1,12 +1,14 @@
 <nav class="navbar">
   <div class="navbar-brand">
-    <span class="logo-arabic">وَرَق</span>
-    <span class="logo-text">Waraq</span>
+    <a routerLink="/" class="brand-link">
+      <span class="logo-arabic">وَرَق</span>
+      <span class="logo-text">Waraq</span>
+    </a>
   </div>
 
   <ul class="navbar-links">
-    <li><a class="active">Home</a></li>
-    <li><a>Books</a></li>
+    <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
+    <li><a routerLink="/books" routerLinkActive="active">Books</a></li>
     <li><a>Cart</a></li>
     <li><a>My Orders</a></li>
   </ul>
@@ -16,6 +18,16 @@
       🛒
       <span class="cart-badge">3</span>
     </div>
-    <button class="btn-signin">Sign In</button>
+
+    @if (isLoggedIn && user) {
+    <div class="user-menu">
+      <span class="user-name">{{ user.name }}</span>
+      <button class="btn-signin" (click)="logout()">Logout</button>
+    </div>
+    } @else {
+    <a routerLink="/login">
+      <button class="btn-signin">Sign In</button>
+    </a>
+    }
   </div>
 </nav>
