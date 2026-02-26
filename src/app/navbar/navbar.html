@@ -9,13 +9,10 @@
   <ul class="navbar-links">
     <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
     <li><a routerLink="/books" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">Books</a></li>
-    <li><a routerLink="/cart" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">Cart</a></li>
-    <li><a routerLink="/books" routerLinkActive="active">Books</a></li>
     @if (isLoggedIn$ | async) {
     <li><a routerLink="/my-orders" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">My Orders</a></li>
     <li><a routerLink="/cart" routerLinkActive="active">Cart</a></li>
     }
-    <li><a>My Orders</a></li>
   </ul>
 
   <div class="navbar-actions">
