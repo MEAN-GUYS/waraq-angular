@@ -11,8 +11,7 @@ import { userGuard , adminGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
-  { path: 'register', component: Registration },
-  { path: 'my-orders', component: OrdersPage },
+  { path: 'my-orders', component: OrdersPage, canActivate: [userGuard]},
   { path: "books", component: BooksPage },
   { path: "cart", component: CartComponent, canActivate: [userGuard] },
   { path: "admin", component: AdminPage, canActivate: [adminGuard] },
