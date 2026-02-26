@@ -1,21 +1,39 @@
 <nav class="navbar">
   <div class="navbar-brand">
-    <span class="logo-arabic">وَرَق</span>
-    <span class="logo-text">Waraq</span>
+    <a routerLink="/" class="brand-link">
+      <span class="logo-arabic">وَرَق</span>
+      <span class="logo-text">Waraq</span>
+    </a>
   </div>
 
   <ul class="navbar-links">
-    <li><a class="active">Home</a></li>
-    <li><a>Books</a></li>
-    <li><a>Cart</a></li>
+    <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
+    <li><a routerLink="/books" routerLinkActive="active">Books</a></li>
+    @if (isLoggedIn$ | async) {
+    <li><a routerLink="/cart" routerLinkActive="active">Cart</a></li>
+    }
     <li><a>My Orders</a></li>
   </ul>
 
   <div class="navbar-actions">
-    <div class="cart-icon">
+    @if (isLoggedIn$ | async) {
+    <a class="cart-icon" routerLink="/cart" aria-label="Cart">
       🛒
-      <span class="cart-badge">3</span>
+      @if (cartCount$ | async; as count) {
+      <span class="cart-badge">{{ count }}</span>
+      }
+    </a>
+    }
+
+    @if (user$ | async; as user) {
+    <div class="user-menu">
+      <span class="user-name">{{ user.name }}</span>
+      <button class="btn-signin" (click)="logout()">Logout</button>
     </div>
-    <button class="btn-signin">Sign In</button>
+    } @else {
+    <a routerLink="/login">
+      <button class="btn-signin">Sign In</button>
+    </a>
+    }
   </div>
 </nav>
