@@ -8,7 +8,10 @@ import { CartComponent } from './cart/cart';
 export const routes: Routes = [
   { path: '', component: HomePage },
   { path: 'register', component: Registration },
-  { path: 'books', component: BooksPage },
   { path: 'my-orders', component: OrdersPage },
-  { path: 'cart', component: CartComponent },
+  { path: "books", component: BooksPage },
+  { path: "cart", component: CartPage, canActivate: [userGuard] },
+  { path: "admin", component: AdminPage, canActivate: [adminGuard] },
+  { path: "register", component: Registration, canActivate: [noAuthGuard] },
+  { path: "login", component: Login, canActivate: [noAuthGuard] },
 ];
