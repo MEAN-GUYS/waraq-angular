@@ -55,9 +55,33 @@ export class AdminPage implements OnInit {
   authors: Author[] = [];
   users = signal<User[]>([]);
   orders = signal<Order[]>([
-    { id: 'ORD-001', customer: 'Sarah M.', items: 3, total: 73.94, status: 'Processing', payment: 'PENDING', date: 'Feb 18' },
-    { id: 'ORD-002', customer: 'Ahmed K.', items: 1, total: 16.99, status: 'Out for Delivery', payment: 'PENDING', date: 'Feb 15' },
-    { id: 'ORD-003', customer: 'Lisa T.', items: 2, total: 27.98, status: 'Delivered', payment: 'SUCCESS', date: 'Feb 10' },
+    {
+      id: 'ORD-001',
+      date: 'Feb 18',
+      status: 'Processing',
+      trackingNumber: 'TRK001',
+      estimatedDelivery: 'Feb 22',
+      total: 73.94,
+      items: []
+    },
+    {
+      id: 'ORD-002',
+      date: 'Feb 15',
+      status: 'Out for Delivery',
+      trackingNumber: 'TRK002',
+      estimatedDelivery: 'Feb 19',
+      total: 16.99,
+      items: []
+    },
+    {
+      id: 'ORD-003',
+      date: 'Feb 10',
+      status: 'Delivered',
+      trackingNumber: 'TRK003',
+      estimatedDelivery: 'Feb 14',
+      total: 27.98,
+      items: []
+    },
   ]);
 
   // Feedback
