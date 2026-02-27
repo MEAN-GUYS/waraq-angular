@@ -8,7 +8,7 @@ import { BooksParams, BooksResponse } from '../models/books';
   providedIn: 'root',
 })
 export default class BooksService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getBooks(params?: BooksParams): Observable<BooksResponse> {
     let httpParams = new HttpParams();
@@ -23,5 +23,17 @@ export default class BooksService {
     }
 
     return this.http.get<BooksResponse>(`${environment.apiUrl}/books`, { params: httpParams });
+  }
+
+  createBook(formData: FormData): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/books`, formData);
+  }
+
+  updateBook(id: string, formData: FormData): Observable<any> {
+    return this.http.patch(`${environment.apiUrl}/books/${id}`, formData);
+  }
+
+  deleteBook(id: string): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/books/${id}`);
   }
 }

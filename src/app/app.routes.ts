@@ -7,7 +7,7 @@ import { CartComponent } from './cart/cart';
 import { AdminPage } from './components/admin-page/admin-page';
 import { Login } from './components/login/login';
 import { noAuthGuard } from './guards/no-auth.guard';
-import { userGuard , adminGuard } from './guards/role.guard';
+import { userGuard, adminGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
