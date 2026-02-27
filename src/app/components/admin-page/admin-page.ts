@@ -62,6 +62,7 @@ export class AdminPage implements OnInit {
 
   // Feedback
   notification: { message: string, type: 'success' | 'error' | null } = { message: '', type: null };
+  notificationTimeoutId?: number;
   isDeletingUser = false;
 
   ngOnInit(): void {
@@ -86,15 +87,36 @@ export class AdminPage implements OnInit {
   }
 
   loadBooks(): void {
-    this.bookService.getBooks({ limit: 5 }).subscribe(res => this.books = res.results);
+    this.bookService.getBooks({ limit: 5 }).subscribe({
+      next: res => this.books = res.results,
+      error: err => {
+        console.error('Failed to load books:', err);
+        this.books = [];
+        this.showNotification('Failed to load books. Please try again.');
+      }
+    });
   }
 
   loadAuthors(): void {
-    this.authorService.getAuthors({ limit: 10 }).subscribe(res => this.authors = res.results);
+    this.authorService.getAuthors({ limit: 10 }).subscribe({
+      next: res => this.authors = res.results,
+      error: err => {
+        console.error('Failed to load authors:', err);
+        this.authors = [];
+        this.showNotification('Failed to load authors. Please try again.');
+      }
+    });
   }
 
   loadUsers(): void {
-    this.userService.getUsers({ limit: 10 }).subscribe(res => this.users.set(res.results));
+    this.userService.getUsers({ limit: 10 }).subscribe({
+      next: res => this.users.set(res.results),
+      error: err => {
+        console.error('Failed to load users:', err);
+        this.users.set([]);
+        this.showNotification('Failed to load users. Please try again.');
+      }
+    });
   }
 
   setView(view: 'dashboard' | 'books' | 'authors' | 'users' | 'orders'): void {
@@ -149,19 +171,57 @@ export class AdminPage implements OnInit {
     this.deleteUser(this.pendingDeleteUser.id);
   }
 
-  showNotification(message: string, type: 'success' | 'error'): void {
+  showNotification(message: string, type: 'success' | 'error' = 'error'): void {
+    // clear any existing timer
+    if (this.notificationTimeoutId) {
+      clearTimeout(this.notificationTimeoutId);
+    }
+
     this.notification = { message, type };
-    setTimeout(() => {
+    this.notificationTimeoutId = setTimeout(() => {
       this.notification = { message: '', type: null };
-    }, 3000);
+      this.notificationTimeoutId = undefined;
+    }, 3000) as unknown as number;
   }
 
-  // Placeholder for Edit/Update actions
+  // Edit/Update actions
   editBook(book: Book): void {
-    console.log('Edit book', book);
+    // todo: implement edit modal or navigate to edit page
+    this.showNotification('Edit book feature coming soon', 'error');
   }
 
   updateOrderStatus(orderId: string): void {
-    console.log('Update order status', orderId);
+    // todo: implement order status update
+    this.showNotification('Order status update coming soon', 'error');
+  }
+
+  // Add handlers
+  onAddBook(): void {
+    // todo: open add book modal or navigate to add page
+    this.showNotification('Add book feature coming soon', 'error');
+  }
+
+  onAddAuthor(): void {
+    // todo: open add author modal
+    this.showNotification('Add author feature coming soon', 'error');
+  }
+
+  // Edit handlers
+  onEditAuthor(author: Author): void {
+    // todo: open edit author modal
+    this.showNotification('Edit author feature coming soon', 'error');
+  }
+
+  onEditUser(user: User): void {
+    // todo: open edit user modal
+    this.showNotification('Edit user feature coming soon', 'error');
+  }
+
+  // Delete handlers
+  onDeleteAuthor(author: Author): void {
+    if (confirm(`Delete author ${author.name}?`)) {
+      // todo: implement author deletion
+      this.showNotification('Delete author feature coming soon', 'error');
+    }
   }
 }

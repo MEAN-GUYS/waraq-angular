@@ -136,7 +136,7 @@
     <section *ngIf="currentView === 'books'" class="management-view">
       <header class="section-header">
         <h2>Books Management</h2>
-        <button class="btn-primary">+ Add Book</button>
+        <button class="btn-primary" (click)="onAddBook()">+ Add Book</button>
       </header>
       <table class="admin-table">
         <thead>
@@ -204,7 +204,7 @@
     <section *ngIf="currentView === 'authors'" class="management-view">
       <header class="section-header">
         <h2>Authors Management</h2>
-        <button class="btn-primary">+ Add Author</button>
+        <button class="btn-primary" (click)="onAddAuthor()">+ Add Author</button>
       </header>
       <table class="admin-table">
         <thead>
@@ -220,8 +220,8 @@
             <td class="bold-text">{{ author.name }}</td>
             <td>
               <div class="action-btns">
-                <button class="btn-edit">Edit</button>
-                <button class="btn-delete">Delete</button>
+                <button class="btn-edit" (click)="onEditAuthor(author)">Edit</button>
+                <button class="btn-delete" (click)="onDeleteAuthor(author)">Delete</button>
               </div>
             </td>
           </tr>
@@ -250,7 +250,7 @@
             <td><span class="badge role-badge">{{ user.role }}</span></td>
             <td>
               <div class="action-btns">
-                <button class="btn-edit">Edit</button>
+                <button class="btn-edit" (click)="onEditUser(user)">Edit</button>
                 <button class="btn-delete" (click)="requestDeleteUser(user)" [disabled]="isDeletingUser">
                   {{ isDeletingUser ? '...' : 'Delete' }}
                 </button>
