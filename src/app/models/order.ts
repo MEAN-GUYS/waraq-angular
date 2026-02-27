@@ -1,17 +1,21 @@
-export interface Order {
-    id: string;
-    customer: string;
-    items: number;
-    total: number;
-    status: 'Processing' | 'Out for Delivery' | 'Delivered' | 'Cancelled';
-    payment: 'PENDING' | 'SUCCESS' | 'FAILED';
-    date: string;
+export interface OrderItem {
+  id: string;
+  title: string;
+  author: string;
+  cover: string;
+  price: number;
+  quantity: number;
+  rating?: number;
+  review?: string;
+  liked?: boolean | null;
 }
 
-export interface OrdersResponse {
-    results: Order[];
-    page: number;
-    limit: number;
-    totalPages: number;
-    totalResults: number;
+export interface Order {
+  id: string;
+  date: string;
+  status: 'Processing' | 'Shipped' | 'Out for Delivery' | 'Delivered';
+  trackingNumber: string;
+  estimatedDelivery: string;
+  total: number;
+  items: OrderItem[];
 }
