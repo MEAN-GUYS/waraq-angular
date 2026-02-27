@@ -1,38 +1,38 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface OrderItem {
-  id: string;
-  book: {
-    id: string;
-    name: string;
-    author: string;
-    cover: string;
-    price: number;
-  };
-  quantity: number;
+  book: string;
+  name: string;
+  cover: string;
   price: number;
-  rating?: number;
-  review?: string;
-  liked?: boolean | null;
+  quantity: number;
+}
+
+export interface OrderAddress {
+  street: string;
+  city: string;
+  country: string;
 }
 
 export interface Order {
   id: string;
-  status: 'Processing' | 'Shipped' | 'Out for Delivery' | 'Delivered';
-  trackingNumber: string;
-  estimatedDelivery: string;
-  total: number;
+  user: string;
   items: OrderItem[];
-  createdAt: string;
+  address: OrderAddress;
+  shippingStatus: 'processing' | 'out for delivery' | 'delivered';
+  paymentMethod: 'COD';
+  paymentStatus: 'pending' | 'success';
+  totalPrice: number;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export default class OrdersService {
-  private apiUrl = 'http://localhost:3000/v1';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 

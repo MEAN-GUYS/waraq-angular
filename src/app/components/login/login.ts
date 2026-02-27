@@ -50,7 +50,9 @@ export class Login {
             next: () => {
                 this.loading = false;
                 const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-                const safeReturnUrl = returnUrl && returnUrl.startsWith('/') ? returnUrl : '/';
+                // prevent //evil.com attacks
+                const isSafeUrl = returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//');
+                const safeReturnUrl = isSafeUrl ? returnUrl : '/';
                 this.router.navigateByUrl(safeReturnUrl);
                 this.cdr.detectChanges();
             },

@@ -8,7 +8,7 @@ import { AdminPage } from './components/admin-page/admin-page';
 import { Login } from './components/login/login';
 import { BookDetails } from './components/book-details/book-details';
 import { noAuthGuard } from './guards/no-auth.guard';
-import { userGuard , adminGuard } from './guards/role.guard';
+import { userGuard, adminGuard } from './guards/role.guard';
 
 export const routes: Routes = [
   { path: '', component: HomePage },

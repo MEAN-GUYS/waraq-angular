@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 export interface CartItem {
-  id: number;
-  title: string;
-  author: string;
-  price: number;
+  book: string;
   quantity: number;
-  image: string;
+  price: number;
 }
 
 @Injectable({
@@ -15,7 +13,7 @@ export interface CartItem {
 })
 
 export class CartService {
-  private apiUrl = 'http://localhost:3000/v1';
+  private apiUrl = environment.apiUrl;
 
   items: CartItem[] = [];
 
@@ -29,25 +27,34 @@ export class CartService {
     });
   }
 
-  increase(id: number) {
-    const item = this.items.find(i => i.id === id);
+  increase(bookId: string) {
+    const item = this.items.find(i => i.book === bookId);
     if (item) {
+      const prev = item.quantity;
       item.quantity++;
-      this.http.put(`${this.apiUrl}/cart/${id}`, { quantity: item.quantity }).subscribe();
+      this.http.put(`${this.apiUrl}/cart/${bookId}`, { quantity: item.quantity }).subscribe({
+        error: () => { item.quantity = prev; }
+      });
     }
   }
 
-  decrease(id: number) {
-    const item = this.items.find(i => i.id === id);
+  decrease(bookId: string) {
+    const item = this.items.find(i => i.book === bookId);
     if (item && item.quantity > 1) {
+      const prev = item.quantity;
       item.quantity--;
-      this.http.put(`${this.apiUrl}/cart/${id}`, { quantity: item.quantity }).subscribe();
+      this.http.put(`${this.apiUrl}/cart/${bookId}`, { quantity: item.quantity }).subscribe({
+        error: () => { item.quantity = prev; }
+      });
     }
   }
 
-  remove(id: number) {
-    this.items = this.items.filter(i => i.id !== id);
-    this.http.delete(`${this.apiUrl}/cart/${id}`).subscribe();
+  remove(bookId: string) {
+    const removed = this.items.find(i => i.book === bookId);
+    this.items = this.items.filter(i => i.book !== bookId);
+    this.http.delete(`${this.apiUrl}/cart/${bookId}`).subscribe({
+      error: () => { if (removed) this.items.push(removed); }
+    });
   }
 
   getSubtotal(): number {
