@@ -5,8 +5,8 @@ export interface Book {
     price: number,
     stock:number,
     id:string,
-    averageRating: number,
-    reviewCount: number
+    averageRating?: number,
+    reviewCount?: number
 }
 
 export interface BooksResponse {

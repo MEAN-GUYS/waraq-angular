@@ -12,9 +12,9 @@ import { CartService } from '../services/cart';
 export class CartComponent {
   constructor(public cartService: CartService) {}
 
-  increase(id: number) { this.cartService.increase(id); }
-  decrease(id: number) { this.cartService.decrease(id); }
-  remove(id: number) { this.cartService.remove(id); }
+  increase(bookId: string) { this.cartService.increase(bookId); }
+  decrease(bookId: string) { this.cartService.decrease(bookId); }
+  remove(bookId: string) { this.cartService.remove(bookId); }
 
   get subtotal() { return this.cartService.getSubtotal(); }
   get itemCount() { return this.cartService.getItemCount(); }
