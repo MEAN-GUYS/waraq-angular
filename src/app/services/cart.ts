@@ -30,22 +30,31 @@ export class CartService {
   increase(bookId: string) {
     const item = this.items.find(i => i.book === bookId);
     if (item) {
+      const prev = item.quantity;
       item.quantity++;
-      this.http.put(`${this.apiUrl}/cart/${bookId}`, { quantity: item.quantity }).subscribe();
+      this.http.put(`${this.apiUrl}/cart/${bookId}`, { quantity: item.quantity }).subscribe({
+        error: () => { item.quantity = prev; }
+      });
     }
   }
 
   decrease(bookId: string) {
     const item = this.items.find(i => i.book === bookId);
     if (item && item.quantity > 1) {
+      const prev = item.quantity;
       item.quantity--;
-      this.http.put(`${this.apiUrl}/cart/${bookId}`, { quantity: item.quantity }).subscribe();
+      this.http.put(`${this.apiUrl}/cart/${bookId}`, { quantity: item.quantity }).subscribe({
+        error: () => { item.quantity = prev; }
+      });
     }
   }
 
   remove(bookId: string) {
+    const removed = this.items.find(i => i.book === bookId);
     this.items = this.items.filter(i => i.book !== bookId);
-    this.http.delete(`${this.apiUrl}/cart/${bookId}`).subscribe();
+    this.http.delete(`${this.apiUrl}/cart/${bookId}`).subscribe({
+      error: () => { if (removed) this.items.push(removed); }
+    });
   }
 
   getSubtotal(): number {
