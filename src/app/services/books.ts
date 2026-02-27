@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { BooksParams, BooksResponse } from '../models/books';
+import { Book, BooksParams, BooksResponse } from '../models/books';
 
 @Injectable({
   providedIn: 'root',
@@ -25,6 +25,10 @@ export default class BooksService {
     return this.http.get<BooksResponse>(`${environment.apiUrl}/books`, { params: httpParams });
   }
 
+
+  getBookById(id: string): Observable<Book> {
+    return this.http.get<Book>(`${environment.apiUrl}/books/${id}`);
+  }
   createBook(formData: FormData): Observable<any> {
     return this.http.post(`${environment.apiUrl}/books`, formData);
   }
@@ -35,5 +39,6 @@ export default class BooksService {
 
   deleteBook(id: string): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/books/${id}`);
+
   }
 }
