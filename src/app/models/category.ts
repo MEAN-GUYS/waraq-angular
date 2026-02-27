@@ -1,11 +1,10 @@
-export interface Author {
+export interface Category {
     id: string;
     name: string;
-    bio?: string;
 }
 
-export interface AuthorsResponse {
-    results: Author[];
+export interface CategoriesResponse {
+    results: Category[];
     page: number;
     limit: number;
     totalPages: number;
