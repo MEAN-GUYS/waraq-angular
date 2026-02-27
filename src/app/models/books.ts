@@ -6,7 +6,9 @@ export interface Book {
     stock:number,
     id:string,
     averageRating: number,
-    reviewCount: number
+    reviewCount: number,
+    author?: any,
+    category?: any
 }
 
 export interface BooksResponse {
@@ -25,4 +27,3 @@ export interface BooksParams {
     limit?:number
     page?:number
 }
-
