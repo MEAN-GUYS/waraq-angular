@@ -35,7 +35,12 @@
         <span>Total</span>
         <span>${{ subtotal.toFixed(2) }}</span>
       </div>
-      <button class="btn-checkout">Proceed to Checkout</button>
+      <button class="btn-checkout" 
+        [routerLink]="itemCount > 0 ? '/checkout' : null"
+        [class.disabled]="itemCount === 0"
+        [disabled]="itemCount === 0">
+        Proceed to Checkout
+      </button>
       <p class="secure-note">🔒 Secure checkout</p>
     </div>
   </div>

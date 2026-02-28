@@ -1,0 +1,196 @@
+<div class="checkout-page">
+
+  <div class="checkout-left">
+
+    <div class="steps-indicator">
+      <div class="step-item" [class.active]="step >= 1" [class.done]="step > 1">
+        <div class="step-circle">{{ step > 1 ? '✓' : '1' }}</div>
+        <span>Delivery</span>
+      </div>
+      <div class="step-line" [class.active]="step > 1"></div>
+      <div class="step-item" [class.active]="step >= 2" [class.done]="step > 2">
+        <div class="step-circle">{{ step > 2 ? '✓' : '2' }}</div>
+        <span>Payment</span>
+      </div>
+      <div class="step-line" [class.active]="step > 2"></div>
+      <div class="step-item" [class.active]="step >= 3">
+        <div class="step-circle">3</div>
+        <span>Review</span>
+      </div>
+    </div>
+
+    <div class="form-section" *ngIf="step === 1">
+      <h2 class="section-title">Delivery Address</h2>
+
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" [(ngModel)]="address.fullName" placeholder="John Doe" />
+      </div>
+      <div class="form-group">
+        <label>Street Address</label>
+        <input type="text" [(ngModel)]="address.street" placeholder="123 Main Street" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>City</label>
+          <input type="text" [(ngModel)]="address.city" placeholder="Cairo" />
+        </div>
+        <div class="form-group">
+          <label>Country</label>
+          <input type="text" [(ngModel)]="address.country" placeholder="Egypt" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" [(ngModel)]="address.phone" placeholder="+20 1234567890" />
+      </div>
+
+      <button class="btn-next" (click)="nextStep()">Continue to Payment →</button>
+    </div>
+
+    <div class="form-section" *ngIf="step === 2">
+      <h2 class="section-title">Payment Method</h2>
+
+      <div class="payment-options">
+        <div class="payment-option" [class.selected]="paymentMethod === 'card'" (click)="paymentMethod = 'card'">
+          <span class="payment-icon">💳</span>
+          <div>
+            <strong>Credit / Debit Card</strong>
+            <p>Visa, Mastercard, Amex</p>
+          </div>
+          <div class="radio-dot" [class.active]="paymentMethod === 'card'"></div>
+        </div>
+        <div class="payment-option" [class.selected]="paymentMethod === 'cash'" (click)="paymentMethod = 'cash'">
+          <span class="payment-icon">💵</span>
+          <div>
+            <strong>Cash on Delivery</strong>
+            <p>Pay when you receive</p>
+          </div>
+          <div class="radio-dot" [class.active]="paymentMethod === 'cash'"></div>
+        </div>
+      </div>
+
+      <div class="card-form" *ngIf="paymentMethod === 'card'">
+        <div class="card-preview">
+          <div class="card-preview-top">
+            <span class="card-chip">▪▪▪</span>
+            <span class="card-type">VISA</span>
+          </div>
+          <div class="card-number-preview">{{ card.number || '•••• •••• •••• ••••' }}</div>
+          <div class="card-preview-bottom">
+            <span>{{ card.name || 'CARD HOLDER' }}</span>
+            <span>{{ card.expiry || 'MM/YY' }}</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Card Number</label>
+          <input type="text" [value]="card.number" (input)="formatCardNumber($event)"
+                 placeholder="1234 5678 9012 3456" maxlength="19" />
+        </div>
+        <div class="form-group">
+          <label>Cardholder Name</label>
+          <input type="text" [(ngModel)]="card.name" placeholder="John Doe" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Expiry Date</label>
+            <input type="text" [value]="card.expiry" (input)="formatExpiry($event)"
+                   placeholder="MM/YY" maxlength="5" />
+          </div>
+          <div class="form-group">
+            <label>CVV</label>
+            <input type="password" [(ngModel)]="card.cvv" placeholder="•••" maxlength="3" />
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" (click)="prevStep()">← Back</button>
+        <button class="btn-next" (click)="nextStep()">Review Order →</button>
+      </div>
+    </div>
+
+    <div class="form-section" *ngIf="step === 3">
+      <h2 class="section-title">Review Your Order</h2>
+
+      <div class="review-section">
+        <h4>📍 Delivery Address</h4>
+        <p>{{ address.fullName }}, {{ address.street }}, {{ address.city }}, {{ address.country }}</p>
+        <p>{{ address.phone }}</p>
+      </div>
+
+      <div class="review-section">
+        <h4>💳 Payment</h4>
+        <p *ngIf="paymentMethod === 'card'">Card ending in {{ card.number.slice(-4) }}</p>
+        <p *ngIf="paymentMethod === 'cash'">Cash on Delivery</p>
+      </div>
+
+      <div class="review-section">
+        <h4>📦 Items</h4>
+        <div class="review-item" *ngFor="let item of currentItems">
+          <span>{{ item.productId }} × {{ item.quantity }}</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-back" (click)="prevStep()">← Back</button>
+        <button class="btn-place" (click)="placeOrder()" [disabled]="isPlacingOrder">
+          {{ isPlacingOrder ? 'Placing Order...' : 'Place Order 🎉' }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="checkout-right">
+    <div class="order-summary">
+      <h3>Order Summary</h3>
+
+      <div class="summary-items">
+        <div class="summary-item" *ngFor="let item of currentItems">
+          <div class="summary-item-left">
+            <span class="summary-emoji">📕</span>
+            <div>
+              <p class="summary-book-name">{{ item.productId }}</p>
+              <p class="summary-book-qty">Qty: {{ item.quantity }}</p>
+            </div>
+          </div>
+          <span class="summary-item-price">× {{ item.quantity }}</span>
+        </div>
+      </div>
+
+      <div class="promo-section">
+        <input type="text" [(ngModel)]="promoCode" placeholder="Promo code" class="promo-input" />
+        <button class="btn-promo" (click)="applyPromo()">Apply</button>
+      </div>
+      <p class="promo-success" *ngIf="promoApplied">✓ {{ discount }}% discount applied!</p>
+      <p class="promo-error" *ngIf="promoError">{{ promoError }}</p>
+
+      <div class="summary-divider"></div>
+
+      <div class="summary-row">
+        <span>Subtotal</span>
+        <span>${{ subtotal.toFixed(2) }}</span>
+      </div>
+      <div class="summary-row" *ngIf="promoApplied">
+        <span class="discount-label">Discount ({{ discount }}%)</span>
+        <span class="discount-value">-${{ discountAmount.toFixed(2) }}</span>
+      </div>
+      <div class="summary-row">
+        <span>Shipping</span>
+        <span class="free">Free</span>
+      </div>
+
+      <div class="summary-divider"></div>
+
+      <div class="summary-row total">
+        <span>Total</span>
+        <span>${{ total.toFixed(2) }}</span>
+      </div>
+
+      <p class="secure-note">🔒 Secure 256-bit SSL encryption</p>
+    </div>
+  </div>
+
+</div>

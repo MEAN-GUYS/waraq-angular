@@ -296,3 +296,11 @@
   transform: scale(1.05);
   color: #c9a84c;
 }
+
+.btn-checkout:disabled {
+  background: #d0c9b8;
+  color: #a09888;
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.6;
+}
