@@ -1,10 +1,21 @@
 <div class="orders-page">
+
+  <div class="thankyou-popup" *ngIf="showThankYou">
+    <div class="thankyou-content">
+      <span class="thankyou-emoji">🥰</span>
+      <h3>Thank you, dear reader!</h3>
+      <p>Your review helps other book lovers find their next favorite read.</p>
+    </div>
+  </div>
+
   <div class="orders-header">
     <h2 class="orders-title">My Orders</h2>
     <p class="orders-subtitle">{{ orders.length }} orders placed</p>
   </div>
 
-  <div *ngIf="isLoading" class="loading">Loading your orders...</div>
+  <div *ngIf="isLoading" class="loading">
+    Loading your orders...
+  </div>
 
   <div class="orders-list" *ngIf="!isLoading">
     <div class="order-card" *ngFor="let order of orders">
@@ -14,47 +25,111 @@
           <span class="order-id">{{ order.id }}</span>
           <span class="order-date">{{ order.createdAt | date:'MMM d, y' }}</span>
         </div>
+
         <div class="order-right">
           <span class="order-total">${{ order.totalPrice.toFixed(2) }}</span>
-          <span class="status-badge" [ngClass]="getStatusClass(order.shippingStatus)">
+
+          <span class="status-badge"
+                [ngClass]="getStatusClass(order.shippingStatus)">
             {{ order.shippingStatus }}
           </span>
-          <span class="chevron" [class.open]="expandedOrder === order.id">›</span>
+
+          <span class="chevron"
+                [class.open]="expandedOrder === order.id">›</span>
         </div>
       </div>
 
-      <div class="order-body" [class.expanded]="expandedOrder === order.id">
+      <div class="order-body"
+           [class.expanded]="expandedOrder === order.id">
 
         <div class="progress-track">
           <div class="progress-step"
-               *ngFor="let step of ['processing', 'out for delivery', 'delivered']; let i = index"
+               *ngFor="let step of ['processing','out for delivery','delivered']; let i = index"
                [class.active]="getStatusStep(order.shippingStatus) > i"
                [class.current]="getStatusStep(order.shippingStatus) === i + 1">
             <div class="step-dot"></div>
             <span class="step-label">{{ step }}</span>
           </div>
+
           <div class="progress-line">
-            <div class="progress-fill" [style.width.%]="(getStatusStep(order.shippingStatus) - 1) * 50"></div>
+            <div class="progress-fill"
+                 [style.width.%]="(getStatusStep(order.shippingStatus) - 1) * 50"></div>
           </div>
         </div>
 
         <div class="order-items">
-          <div class="order-item" *ngFor="let item of order.items">
+          <div class="order-item"
+               *ngFor="let item of order.items">
+
             <div class="item-left">
-              <img [src]="item.cover" alt="cover" class="item-cover" *ngIf="item.cover" />
-              <div class="item-cover" *ngIf="!item.cover">📕</div>
+              <img *ngIf="item.cover"
+                   [src]="item.cover"
+                   alt="cover"
+                   class="item-cover" />
+              <div *ngIf="!item.cover" class="item-cover">📕</div>
+
               <div class="item-info">
                 <h4>{{ item.name }}</h4>
                 <span class="item-qty">Qty: {{ item.quantity }}</span>
               </div>
             </div>
+
             <div class="item-right">
-              <span class="item-price">${{ (item.price * item.quantity).toFixed(2) }}</span>
+              <span class="item-price">
+                ${{ (item.price * item.quantity).toFixed(2) }}
+              </span>
             </div>
-          </div>
+
+            <div *ngIf="order.shippingStatus === 'delivered'" class="item-review">
+
+              <button class="btn-review"
+                      (click)="toggleReview(item.book)">
+                {{ reviewingItem === item.book ? 'Cancel' : '✍️ Leave a Review' }}
+              </button>
+
+              <div class="review-form" *ngIf="reviewingItem === item.book">
+
+                <div class="stars-input">
+                  <span *ngFor="let s of [1,2,3,4,5]"
+                        class="star"
+                        [class.filled]="s <= (reviewData[item.book]?.rating || 0)"
+                        (click)="setRating(item.book, s)">★</span>
+                </div>
+
+                <textarea class="review-text"
+                          [(ngModel)]="reviewData[item.book].review"
+                          placeholder="Share your thoughts about this book...">
+                </textarea>
+
+                <div class="like-section">
+                  <span class="like-label">Would you recommend it?</span>
+                  <div class="like-buttons">
+                    <button class="like-btn"
+                            [class.active]="reviewData[item.book]?.liked === true"
+                            (click)="setLike(item.book, true)">
+                      👍 Yes
+                    </button>
+                    <button class="like-btn dislike"
+                            [class.active]="reviewData[item.book]?.liked === false"
+                            (click)="setLike(item.book, false)">
+                      👎 No
+                    </button>
+                  </div>
+                </div>
+
+                <button class="btn-submit"
+                        (click)="submitReview(item.book)"
+                        [disabled]="!reviewData[item.book]?.rating">
+                  Submit Review
+                </button>
+
+              </div> 
+            </div> 
+
+          </div> 
         </div>
 
-      </div>
-    </div>
-  </div>
-</div>
+      </div> 
+    </div> 
+  </div> 
+</div> 

@@ -14,7 +14,6 @@ export type CartItem = {
 export class CartService {
   private readonly STORAGE_KEY = 'cart_items';
   private readonly isBrowser: boolean;
-
   private readonly itemsSubject: BehaviorSubject<CartItem[]>;
   readonly items$: Observable<CartItem[]>;
   readonly count$: Observable<number>;
@@ -24,7 +23,6 @@ export class CartService {
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
-
     const initialItems = this.isBrowser ? this.readFromStorage() : [];
     this.itemsSubject = new BehaviorSubject<CartItem[]>(initialItems);
     this.items$ = this.itemsSubject.asObservable();
@@ -32,9 +30,8 @@ export class CartService {
       map((items) => items.reduce((sum, item) => sum + item.quantity, 0)),
       distinctUntilChanged()
     );
-
     if (this.isBrowser) {
-      this.authService.isLoggedIn$.subscribe((loggedIn) => {
+      this.authService.isLoggedIn$.subscribe((loggedIn: boolean) => {
         if (!loggedIn) this.clear();
       });
     }
@@ -56,7 +53,6 @@ export class CartService {
       if (!raw) return [];
       const parsed = JSON.parse(raw) as unknown;
       if (!Array.isArray(parsed)) return [];
-
       return parsed
         .filter((v): v is CartItem => !!v && typeof v === 'object')
         .map((item: any) => ({

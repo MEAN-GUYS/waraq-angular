@@ -3,11 +3,11 @@
   <div class="flex flex-col gap-10 lg:flex-row">
 
     <!-- Left: Cover -->
-    <div class="overflow-hidden rounded-xl bg-[#e8e3da] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+    <div class="overflow-hidden rounded-xl bg-white shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
       <img
         [src]="bookState().cover"
         [alt]="bookState().name"
-        class="h-[400px] w-[280px] rounded-md object-cover shadow-[4px_4px_20px_rgba(0,0,0,0.15)]"
+        class="h-[400px] w-[280px] rounded-xl object-contain"
       />
     </div>
 
@@ -19,12 +19,8 @@
         </h1>
 
         @if (bookState().author) {
-          <p class="mt-3 text-base font-semibold text-[#3d5a47]">{{ bookState().author }}</p>
+          <p class="mt-3 text-base font-semibold text-[#3d5a47]">{{ bookState().author?.name || bookState().author }}</p>
         }
-
-        <p class="mt-4 max-w-[480px] text-[15px] italic leading-relaxed text-[#6b6560]">
-          {{ bookState().description }}
-        </p>
 
         <!-- Details grid -->
         <div class="mt-6 grid grid-cols-2 gap-x-10 gap-y-4 max-w-[400px]">
@@ -49,13 +45,13 @@
           @if (bookState().author) {
             <div>
               <p class="text-xs font-semibold uppercase tracking-wider text-[#8a8680]">Author</p>
-              <p class="mt-1 text-sm text-[#5a5550]">{{ bookState().author }}</p>
+              <p class="mt-1 text-sm text-[#5a5550]">{{ bookState().author?.name || bookState().author }}</p>
             </div>
           }
           @if (bookState().category) {
             <div>
               <p class="text-xs font-semibold uppercase tracking-wider text-[#8a8680]">Category</p>
-              <p class="mt-1 text-sm text-[#5a5550]">{{ bookState().category }}</p>
+              <p class="mt-1 text-sm text-[#5a5550]">{{ bookState().category?.name || bookState().category }}</p>
             </div>
           }
         </div>
@@ -68,7 +64,7 @@
           [disabled]="bookState().stock === 0 || isAddingToCart()"
           [class.opacity-50]="bookState().stock === 0 || isAddingToCart()"
           [class.cursor-not-allowed]="bookState().stock === 0 || isAddingToCart()"
-          class="flex items-center gap-2 rounded-full bg-[#3d5a47] px-8 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#2e4636]"
+          class="flex items-center gap-2 rounded-full bg-[#1d2e50] px-8 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#c9a84c] hover:text-[#0d1b35]"
         >
           @if (isAddingToCart()) {
             Adding...
@@ -104,7 +100,37 @@
     <!-- Right: Reviews -->
     <div class="w-full lg:w-[380px]">
       <h2 class="text-lg font-bold text-[#1a1a1a]">Reviews</h2>
-      <p class="mt-3 text-sm text-[#8a8680]">No reviews yet.</p>
+
+      @if (reviews().length === 0) {
+        <p class="mt-3 text-sm text-[#8a8680]">No reviews yet. Be the first to review!</p>
+      }
+
+      @if (reviews().length > 0) {
+        <div class="mt-4 flex flex-col gap-4">
+          @for (review of reviews(); track review) {
+            <div class="review-card">
+              <div class="review-header">
+                <span class="reviewer-name">{{ review.user.name }}</span>
+                <div class="review-stars">
+                  @for (s of getStars(review.rating); track s) {
+                    <span class="star" [class.filled]="s <= review.rating">★</span>
+                  }
+                </div>
+              </div>
+              <p class="review-text">{{ review.review }}</p>
+              <div class="review-footer">
+                @if (review.liked === true) {
+                  <span class="recommend yes">Recommends</span>
+                }
+                @if (review.liked === false) {
+                  <span class="recommend no">Doesn't recommend</span>
+                }
+                <span class="review-date">{{ review.createdAt | date:'MMM d, y' }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
     </div>
   </div>
 </div>

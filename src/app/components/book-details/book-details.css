@@ -1,3 +1,62 @@
-:host {
-  display: block;
+.review-card {
+  background: #fdfbf7;
+  border: 1px solid #e0dbd3;
+  border-radius: 12px;
+  padding: 16px 20px;
+  transition: box-shadow 0.2s ease;
+}
+
+.review-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.reviewer-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a2a4a;
+  font-family: sans-serif;
+}
+
+.review-stars .star {
+  font-size: 16px;
+  color: #d0c9b8;
+}
+
+.review-stars .star.filled {
+  color: #c9a84c;
+}
+
+.review-text {
+  font-size: 14px;
+  color: #5a5550;
+  line-height: 1.6;
+  margin: 0 0 10px 0;
+  font-family: sans-serif;
+}
+
+.review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recommend {
+  font-size: 12px;
+  font-family: sans-serif;
+}
+
+.recommend.yes { color: #2ecc71; }
+.recommend.no { color: #e74c3c; }
+
+.review-date {
+  font-size: 12px;
+  color: #8a8680;
+  font-family: sans-serif;
 }

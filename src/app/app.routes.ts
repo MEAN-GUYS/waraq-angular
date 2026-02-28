@@ -9,6 +9,8 @@ import { Login } from './components/login/login';
 import { BookDetails } from './components/book-details/book-details';
 import { noAuthGuard } from './guards/no-auth.guard';
 import { userGuard, adminGuard } from './guards/role.guard';
+import { CheckoutPage } from './components/checkout-page/checkout-page';
+
 
 export const routes: Routes = [
   { path: '', component: HomePage },
@@ -19,4 +21,5 @@ export const routes: Routes = [
   { path: "admin", component: AdminPage, canActivate: [adminGuard] },
   { path: "register", component: Registration, canActivate: [noAuthGuard] },
   { path: "login", component: Login, canActivate: [noAuthGuard] },
+  { path: 'checkout', component: CheckoutPage, canActivate: [userGuard] }
 ];

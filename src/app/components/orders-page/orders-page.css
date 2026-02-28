@@ -405,6 +405,49 @@
   color: #e74c3c;
 }
 
+.thankyou-popup {
+  position: fixed;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  animation: popIn 0.4s ease both;
+}
+
+.thankyou-content {
+  background: linear-gradient(135deg, #1a2a4a, #0d1b35);
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  border-radius: 16px;
+  padding: 24px 36px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.thankyou-emoji {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.thankyou-content h3 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+}
+
+.thankyou-content p {
+  font-size: 14px;
+  color: #8fa3c0;
+  font-family: sans-serif;
+  margin: 0;
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 .btn-submit {
   background: linear-gradient(135deg, #c9a84c, #e0c068);
   color: #0d1b35;
