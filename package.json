@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build && cp -r dist/waraq/browser ./browser",
+    "build": "ng build && cp -r dist/waraq/browser ./ && cp ./browser/index.csr.html ./browser/index.html",
     "build:ssg": "ng build --configuration production-ssg",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
