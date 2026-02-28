@@ -18,7 +18,6 @@
   </div>
 
   <div class="orders-list" *ngIf="!isLoading">
-
     <div class="order-card" *ngFor="let order of orders">
 
       <div class="order-header" (click)="toggleOrder(order.id)">
@@ -59,7 +58,6 @@
         </div>
 
         <div class="order-items">
-
           <div class="order-item"
                *ngFor="let item of order.items">
 
@@ -68,9 +66,7 @@
                    [src]="item.cover"
                    alt="cover"
                    class="item-cover" />
-
-              <div *ngIf="!item.cover"
-                   class="item-cover">📕</div>
+              <div *ngIf="!item.cover" class="item-cover">📕</div>
 
               <div class="item-info">
                 <h4>{{ item.name }}</h4>
@@ -84,61 +80,56 @@
               </span>
             </div>
 
-            <div *ngIf="order.shippingStatus === 'delivered'"
-                 class="item-review">
+            <div *ngIf="order.shippingStatus === 'delivered'" class="item-review">
 
               <button class="btn-review"
-                      (click)="toggleReview(item.id)">
-                {{ reviewingItem === item.id ? 'Cancel' : '✍️ Leave a Review' }}
+                      (click)="toggleReview(item.book)">
+                {{ reviewingItem === item.book ? 'Cancel' : '✍️ Leave a Review' }}
               </button>
 
-              <div class="review-form"
-                   *ngIf="reviewingItem === item.id">
+              <div class="review-form" *ngIf="reviewingItem === item.book">
 
                 <div class="stars-input">
                   <span *ngFor="let s of [1,2,3,4,5]"
                         class="star"
-                        [class.filled]="s <= (reviewData[item.id]?.rating || 0)"
-                        (click)="setRating(item.id, s)">★</span>
+                        [class.filled]="s <= (reviewData[item.book]?.rating || 0)"
+                        (click)="setRating(item.book, s)">★</span>
                 </div>
 
                 <textarea class="review-text"
-                          [(ngModel)]="reviewData[item.id].review"
+                          [(ngModel)]="reviewData[item.book].review"
                           placeholder="Share your thoughts about this book...">
                 </textarea>
 
                 <div class="like-section">
                   <span class="like-label">Would you recommend it?</span>
-
                   <div class="like-buttons">
                     <button class="like-btn"
-                            [class.active]="reviewData[item.id]?.liked === true"
-                            (click)="setLike(item.id, true)">
+                            [class.active]="reviewData[item.book]?.liked === true"
+                            (click)="setLike(item.book, true)">
                       👍 Yes
                     </button>
-
                     <button class="like-btn dislike"
-                            [class.active]="reviewData[item.id]?.liked === false"
-                            (click)="setLike(item.id, false)">
+                            [class.active]="reviewData[item.book]?.liked === false"
+                            (click)="setLike(item.book, false)">
                       👎 No
                     </button>
                   </div>
                 </div>
 
-                <!-- Submit -->
                 <button class="btn-submit"
-                        (click)="submitReview(item.book.id, item.id)"
-                        [disabled]="!reviewData[item.id]?.rating">
+                        (click)="submitReview(item.book)"
+                        [disabled]="!reviewData[item.book]?.rating">
                   Submit Review
                 </button>
 
-              </div>
-            </div>
+              </div> 
+            </div> 
 
-          </div>
+          </div> 
         </div>
-      </div>
 
-    </div>
-  </div>
-</div>
+      </div> 
+    </div> 
+  </div> 
+</div> 

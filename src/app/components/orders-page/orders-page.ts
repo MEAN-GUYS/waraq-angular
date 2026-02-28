@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import OrdersService, { Order, OrderItem } from '../../services/orders';
+import OrdersService, { Order } from '../../services/orders';
 import { ReviewService } from '../../services/review.service';
 
 @Component({
@@ -10,7 +10,7 @@ import { ReviewService } from '../../services/review.service';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './orders-page.html',
-  styleUrl: './orders-page.css'
+  styleUrls: ['./orders-page.css']
 })
 export class OrdersPage implements OnInit {
   private readonly ordersService = inject(OrdersService);
@@ -23,6 +23,7 @@ export class OrdersPage implements OnInit {
   isLoading = true;
   showThankYou = false;
 
+  // use item.book as key instead of item.id
   reviewData: Record<string, { rating: number; review: string; liked: boolean | null }> = {};
 
   ngOnInit(): void {
@@ -39,25 +40,25 @@ export class OrdersPage implements OnInit {
     this.expandedOrder = this.expandedOrder === orderId ? null : orderId;
   }
 
-  toggleReview(itemId: string) {
-    this.reviewingItem = this.reviewingItem === itemId ? null : itemId;
-    if (!this.reviewData[itemId]) {
-      this.reviewData[itemId] = { rating: 0, review: '', liked: null };
+  toggleReview(bookId: string) {
+    this.reviewingItem = this.reviewingItem === bookId ? null : bookId;
+    if (!this.reviewData[bookId]) {
+      this.reviewData[bookId] = { rating: 0, review: '', liked: null };
     }
   }
 
-  setRating(itemId: string, rating: number) {
-    if (!this.reviewData[itemId]) this.reviewData[itemId] = { rating: 0, review: '', liked: null };
-    this.reviewData[itemId].rating = rating;
+  setRating(bookId: string, rating: number) {
+    if (!this.reviewData[bookId]) this.reviewData[bookId] = { rating: 0, review: '', liked: null };
+    this.reviewData[bookId].rating = rating;
   }
 
-  setLike(itemId: string, value: boolean) {
-    if (!this.reviewData[itemId]) this.reviewData[itemId] = { rating: 0, review: '', liked: null };
-    this.reviewData[itemId].liked = this.reviewData[itemId].liked === value ? null : value;
+  setLike(bookId: string, value: boolean) {
+    if (!this.reviewData[bookId]) this.reviewData[bookId] = { rating: 0, review: '', liked: null };
+    this.reviewData[bookId].liked = this.reviewData[bookId].liked === value ? null : value;
   }
 
-  submitReview(bookId: string, itemId: string) {
-    const data = this.reviewData[itemId];
+  submitReview(bookId: string) {
+    const data = this.reviewData[bookId];
     if (!data || !data.rating) return;
 
     this.reviewService.submitReview({

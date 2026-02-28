@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule, AsyncPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CartService, CartItem } from '../../services/cart.service';
@@ -10,9 +10,9 @@ import { Observable } from 'rxjs';
 @Component({
   selector: 'app-checkout-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, AsyncPipe],
+  imports: [CommonModule, FormsModule],
   templateUrl: './checkout-page.html',
-  styleUrl: './checkout-page.css'
+  styleUrls: ['./checkout-page.css']
 })
 export class CheckoutPage implements OnInit {
   private router = inject(Router);
