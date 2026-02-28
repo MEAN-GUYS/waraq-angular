@@ -26,6 +26,7 @@ export interface Order {
   paymentMethod: 'COD';
   paymentStatus: 'pending' | 'success';
   totalPrice: number;
+  createdAt?: string;
 }
 
 @Injectable({
@@ -37,10 +38,6 @@ export default class OrdersService {
   constructor(private http: HttpClient) {}
 
   getOrders(): Observable<{ results: Order[] }> {
-    return this.http.get<{ results: Order[] }>(`${this.apiUrl}/orders`);
-  }
-
-  submitReview(orderId: string, itemId: string, body: { rating?: number; review?: string; liked?: boolean | null }): Observable<Order> {
-    return this.http.patch<Order>(`${this.apiUrl}/orders/${orderId}/items/${itemId}/review`, body);
+    return this.http.get<{ results: Order[] }>(`${this.apiUrl}/orders/myorders`);
   }
 }

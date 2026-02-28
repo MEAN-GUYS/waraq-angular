@@ -47,42 +47,14 @@ export class AdminPage implements OnInit {
   totalUsers = signal(0);
   totalOrders = computed(() => this.orders().length);
   totalRevenue = computed(() => {
-    return this.orders().reduce((sum, order) => sum + this.toFiniteNumber(order.total), 0);
+    return this.orders().reduce((sum, order) => sum + this.toFiniteNumber(order.totalPrice), 0);
   });
 
   // Data
   books: Book[] = [];
   authors: Author[] = [];
   users = signal<User[]>([]);
-  orders = signal<Order[]>([
-    {
-      id: 'ORD-001',
-      date: 'Feb 18',
-      status: 'Processing',
-      trackingNumber: 'TRK001',
-      estimatedDelivery: 'Feb 22',
-      total: 73.94,
-      items: []
-    },
-    {
-      id: 'ORD-002',
-      date: 'Feb 15',
-      status: 'Out for Delivery',
-      trackingNumber: 'TRK002',
-      estimatedDelivery: 'Feb 19',
-      total: 16.99,
-      items: []
-    },
-    {
-      id: 'ORD-003',
-      date: 'Feb 10',
-      status: 'Delivered',
-      trackingNumber: 'TRK003',
-      estimatedDelivery: 'Feb 14',
-      total: 27.98,
-      items: []
-    },
-  ]);
+  orders = signal<Order[]>([]);
 
   // Feedback
   notification: { message: string, type: 'success' | 'error' | null } = { message: '', type: null };

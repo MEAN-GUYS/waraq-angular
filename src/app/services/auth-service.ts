@@ -35,6 +35,7 @@ export class AuthService {
       name: `${payload.firstName} ${payload.lastName}`,
       email: payload.email,
       password: payload.password,
+      dob: payload.dob,
     };
     return this.http
       .post<AuthResponse>(`${this.AUTH_URL}/register`, body)

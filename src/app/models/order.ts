@@ -21,4 +21,5 @@ export interface Order {
   paymentMethod: 'COD';
   paymentStatus: 'pending' | 'success';
   totalPrice: number;
+  createdAt?: string;
 }

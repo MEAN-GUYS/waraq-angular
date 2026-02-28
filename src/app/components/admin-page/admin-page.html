@@ -174,11 +174,10 @@
         <thead>
           <tr>
             <th>ORDER ID</th>
-            <th>TRACKING</th>
             <th>ITEMS</th>
             <th>TOTAL</th>
             <th>STATUS</th>
-            <th>EST. DELIVERY</th>
+            <th>PAYMENT</th>
             <th>DATE</th>
             <th>ACTIONS</th>
           </tr>
@@ -186,12 +185,11 @@
         <tbody>
           <tr *ngFor="let order of orders()">
             <td class="bold-text">{{ order.id }}</td>
-            <td>{{ order.trackingNumber }}</td>
             <td>{{ order.items.length }}</td>
-            <td class="bold-text">${{ order.total }}</td>
-            <td><span class="badge status-badge" [attr.data-status]="order.status">{{ order.status }}</span></td>
-            <td>{{ order.estimatedDelivery }}</td>
-            <td>{{ order.date }}</td>
+            <td class="bold-text">${{ order.totalPrice }}</td>
+            <td><span class="badge status-badge" [attr.data-status]="order.shippingStatus">{{ order.shippingStatus }}</span></td>
+            <td><span class="badge">{{ order.paymentStatus }}</span></td>
+            <td>{{ order.createdAt | date:'MMM d' }}</td>
             <td>
               <button class="btn-action" (click)="updateOrderStatus(order.id)">Update</button>
             </td>
