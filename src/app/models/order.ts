@@ -1,21 +1,25 @@
 export interface OrderItem {
-  id: string;
-  title: string;
-  author: string;
+  book: string;
+  name: string;
   cover: string;
   price: number;
   quantity: number;
-  rating?: number;
-  review?: string;
-  liked?: boolean | null;
+}
+
+export interface OrderAddress {
+  street: string;
+  city: string;
+  country: string;
 }
 
 export interface Order {
   id: string;
-  date: string;
-  status: 'Processing' | 'Shipped' | 'Out for Delivery' | 'Delivered';
-  trackingNumber: string;
-  estimatedDelivery: string;
-  total: number;
+  user: string;
   items: OrderItem[];
+  address: OrderAddress;
+  shippingStatus: 'processing' | 'out for delivery' | 'delivered';
+  paymentMethod: 'COD';
+  paymentStatus: 'pending' | 'success';
+  totalPrice: number;
+  createdAt?: string;
 }

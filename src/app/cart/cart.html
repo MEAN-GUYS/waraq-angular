@@ -6,16 +6,13 @@
   <div class="cart-layout">
     <div class="cart-items">
       <div class="cart-item" *ngFor="let item of cartService.items">
-        <div class="item-image">{{ item.image }}</div>
-
         <div class="item-details">
-          <h3>{{ item.title }}</h3>
-          <p>{{ item.author }}</p>
+          <p>Qty: {{ item.quantity }}</p>
           <div class="item-controls">
-            <button class="qty-btn" (click)="decrease(item.id)">−</button>
+            <button class="qty-btn" (click)="decrease(item.book)">−</button>
             <span class="qty">{{ item.quantity }}</span>
-            <button class="qty-btn" (click)="increase(item.id)">+</button>
-            <button class="remove-btn" (click)="remove(item.id)">Remove</button>
+            <button class="qty-btn" (click)="increase(item.book)">+</button>
+            <button class="remove-btn" (click)="remove(item.book)">Remove</button>
           </div>
         </div>
 

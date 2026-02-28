@@ -1,7 +1,7 @@
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, BehaviorSubject } from 'rxjs';
+import { Observable, tap, BehaviorSubject, of, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthResponse, LoginPayload, RegistrationPayload, User } from '../models/registration';
 
@@ -35,6 +35,7 @@ export class AuthService {
       name: `${payload.firstName} ${payload.lastName}`,
       email: payload.email,
       password: payload.password,
+      dob: payload.dob,
     };
     return this.http
       .post<AuthResponse>(`${this.AUTH_URL}/register`, body)
@@ -49,13 +50,29 @@ export class AuthService {
 
   logout(): Observable<void> {
     const refreshToken = this.getRefreshToken();
+    // always clear tokens locally first
+    this.clearTokens();
+
+    if (!refreshToken) {
+      return of(undefined);
+    }
+
     return this.http
       .post<void>(`${this.AUTH_URL}/logout`, { refreshToken })
-      .pipe(tap(() => this.clearTokens()));
+      .pipe(
+        catchError(() => {
+          // ignore logout API errors - user is logged out locally
+          return of(undefined);
+        })
+      );
   }
 
   refreshTokens(): Observable<AuthResponse> {
     const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token available'));
+    }
+
     return this.http
       .post<AuthResponse>(`${this.AUTH_URL}/refresh-tokens`, { refreshToken })
       .pipe(tap((res) => this.saveTokens(res.tokens)));
@@ -80,7 +97,15 @@ export class AuthService {
   getUser(): User | null {
     if (!this.isBrowser) return null;
     const raw = localStorage.getItem(this.USER_KEY);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+
+    try {
+      return JSON.parse(raw);
+    } catch {
+      // clear corrupted data
+      localStorage.removeItem(this.USER_KEY);
+      return null;
+    }
   }
 
   getRole(): string | null {

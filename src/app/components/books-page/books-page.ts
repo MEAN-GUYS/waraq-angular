@@ -1,6 +1,7 @@
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import BooksService from '../../services/books';
 import { Book, BooksParams } from '../../models/books';
 
@@ -8,7 +9,7 @@ type SortOption = 'relevance' | 'priceAsc' | 'priceDesc' | 'nameAsc' | 'nameDesc
 
 @Component({
   selector: 'app-books-page',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './books-page.html',
   styleUrl: './books-page.css',
 })

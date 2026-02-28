@@ -1,6 +1,59 @@
-# Waraq
+# Waraq Bookstore - Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.2.
+A full-stack e-commerce bookstore built with the MEAN stack (MongoDB, Express, Angular, Node.js).
+
+This is the Angular frontend for the Waraq bookstore application.
+
+## Features
+
+### User Features
+- **Browse Books**: Search, filter, and sort through the book catalog
+- **Book Details**: View detailed information about books (in progress)
+- **Shopping Cart**: Add/remove books, update quantities, view order summary
+- **User Authentication**: Register, login, logout with JWT-based auth
+- **Order History**: View past orders with shipping status tracking
+
+### Admin Panel (PR #9)
+- **Dashboard**: View revenue and order statistics
+- **Books Management**: CRUD operations for books with cover upload
+- **Authors Management**: CRUD operations for authors
+- **Users Management**: View all users, delete users
+- **Orders Management**: View all orders, update shipping/payment status
+- **Categories Management**: (Coming soon)
+
+### Security Features
+- JWT-based authentication with token interceptors
+- Role-based access control (Admin/User)
+- Route guards for protected pages
+- Secure API integration
+
+## Tech Stack
+- Angular 21.1.2
+- TypeScript
+- Tailwind CSS
+- RxJS with Signals
+- Angular Router with guards
+
+## Prerequisites
+
+- Node.js (v18+ recommended)
+- Angular CLI (`npm install -g @angular/cli`)
+- Backend API running (default: http://localhost:3000)
+
+## Setup
+
+1. Clone the repository:
+```bash
+git clone https://github.com/MEAN-GUYS/waraq-angular.git
+cd waraq-angular
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Configure the backend API URL if needed (update `environment.ts`)
 
 ## Development server
 

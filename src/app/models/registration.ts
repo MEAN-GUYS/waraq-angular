@@ -4,6 +4,7 @@ export interface RegistrationPayload {
   email: string;
   password: string;
   confirmPassword: string;
+  dob: string;
 }
 
 export interface LoginPayload {

@@ -1,5 +1,263 @@
-<section class="page">
-  <h1>Admin</h1>
-  <p>Admin-only area.</p>
-</section>
+<div class="admin-container">
+  <!-- Notification Toast -->
+  <div class="toast-overlay" *ngIf="notification.type">
+    <div class="toast" [class.success]="notification.type === 'success'" [class.error]="notification.type === 'error'">
+      <span class="toast-message">{{ notification.message }}</span>
+    </div>
+  </div>
 
+  <!-- Delete User Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="isDeleteUserDialogOpen" (click)="closeDeleteUserDialog()">
+    <div
+      class="modal"
+      role="alertdialog"
+      aria-modal="true"
+      [attr.aria-label]="'Delete user confirmation'"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="modal-header">
+        <div class="modal-icon danger" aria-hidden="true">!</div>
+        <div class="modal-title-wrap">
+          <h3 class="modal-title">Delete user?</h3>
+          <p class="modal-subtitle">This action cannot be undone.</p>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-text">
+          You are about to permanently delete
+          <span class="modal-user">{{ pendingDeleteUser?.name || 'this user' }}</span>.
+        </p>
+        <p class="modal-hint" *ngIf="pendingDeleteUser?.email">{{ pendingDeleteUser?.email }}</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="closeDeleteUserDialog()" [disabled]="isDeletingUser">Cancel</button>
+        <button class="btn-delete" (click)="confirmDeleteUser()" [disabled]="isDeletingUser">
+          {{ isDeletingUser ? 'Deleting...' : 'Delete user' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2 class="admin-panel-title">ADMIN PANEL</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li [class.active]="currentView === 'dashboard'" (click)="setView('dashboard')">
+          <span class="icon">📊</span> Dashboard
+        </li>
+        <li [class.active]="currentView === 'books'" (click)="setView('books')">
+          <span class="icon">📚</span> Books
+        </li>
+        <li [class.active]="currentView === 'authors'" (click)="setView('authors')">
+          <span class="icon">✍️</span> Authors
+        </li>
+        <li [class.active]="currentView === 'users'" (click)="setView('users')">
+          <span class="icon">👥</span> Users
+        </li>
+        <li [class.active]="currentView === 'orders'" (click)="setView('orders')">
+          <span class="icon">📦</span> Orders
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Dashboard View -->
+    <section *ngIf="currentView === 'dashboard'" class="dashboard-view">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📚</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ totalBooks() }}</span>
+            <span class="stat-label">Total Books</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📦</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ totalOrders() }}</span>
+            <span class="stat-label">Total Orders</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ totalUsers() }}</span>
+            <span class="stat-label">Total Users</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <span class="stat-value">${{ totalRevenue() | number:'1.0-0' }}</span>
+            <span class="stat-label">Revenue</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Tables in Dashboard -->
+      <div class="dashboard-tables">
+        <!-- Books Preview -->
+        <div class="table-section">
+          <header class="section-header">
+            <h3>Recent Books</h3>
+            <button class="btn-add" (click)="setView('books')">+ View All</button>
+          </header>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>COVER</th>
+                <th>TITLE</th>
+                <th>PRICE</th>
+                <th>STOCK</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let book of books.slice(0, 3)">
+                <td><img [src]="book.cover" alt="cover" class="table-img"></td>
+                <td>{{ book.name }}</td>
+                <td>${{ book.price }}</td>
+                <td>{{ book.stock }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Books Management View -->
+    <section *ngIf="currentView === 'books'" class="management-view">
+      <header class="section-header">
+        <h2>Books Management</h2>
+        <button class="btn-primary" (click)="onAddBook()">+ Add Book</button>
+      </header>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>COVER</th>
+            <th>TITLE</th>
+            <th>PRICE</th>
+            <th>STOCK</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let book of books">
+            <td><img [src]="book.cover" alt="cover" class="table-img"></td>
+            <td class="bold-text">{{ book.name }}</td>
+            <td>${{ book.price }}</td>
+            <td [class.low-stock]="book.stock < 10">{{ book.stock }}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-edit" (click)="editBook(book)">Edit</button>
+                <button class="btn-delete" (click)="deleteBook(book.id)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Orders Management View -->
+    <section *ngIf="currentView === 'orders'" class="management-view">
+      <header class="section-header">
+        <h2>Orders Management</h2>
+      </header>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ORDER ID</th>
+            <th>ITEMS</th>
+            <th>TOTAL</th>
+            <th>STATUS</th>
+            <th>PAYMENT</th>
+            <th>DATE</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of orders()">
+            <td class="bold-text">{{ order.id }}</td>
+            <td>{{ order.items.length }}</td>
+            <td class="bold-text">${{ order.totalPrice }}</td>
+            <td><span class="badge status-badge" [attr.data-status]="order.shippingStatus">{{ order.shippingStatus }}</span></td>
+            <td><span class="badge">{{ order.paymentStatus }}</span></td>
+            <td>{{ order.createdAt | date:'MMM d' }}</td>
+            <td>
+              <button class="btn-action" (click)="updateOrderStatus(order.id)">Update</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Authors Management View -->
+    <section *ngIf="currentView === 'authors'" class="management-view">
+      <header class="section-header">
+        <h2>Authors Management</h2>
+        <button class="btn-primary" (click)="onAddAuthor()">+ Add Author</button>
+      </header>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>NAME</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let author of authors">
+            <td>{{ author.id }}</td>
+            <td class="bold-text">{{ author.name }}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-edit" (click)="onEditAuthor(author)">Edit</button>
+                <button class="btn-delete" (click)="onDeleteAuthor(author)">Delete</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Users Management View -->
+    <section *ngIf="currentView === 'users'" class="management-view">
+      <header class="section-header">
+        <h2>Users Management</h2>
+      </header>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>NAME</th>
+            <th>EMAIL</th>
+            <th>ROLE</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users()" @rowAnimation>
+            <td class="bold-text">{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td><span class="badge role-badge">{{ user.role }}</span></td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-edit" (click)="onEditUser(user)">Edit</button>
+                <button class="btn-delete" (click)="requestDeleteUser(user)" [disabled]="isDeletingUser">
+                  {{ isDeletingUser ? '...' : 'Delete' }}
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+</div>

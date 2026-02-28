@@ -1,4 +1,4 @@
-<div class="rounded-xl shadow-md flex flex-col w-56 overflow-hidden border border-amber-100 bg-white">
+<a [routerLink]="['/books', book().id]" class="rounded-xl shadow-md flex flex-col w-56 overflow-hidden border border-amber-100 bg-white cursor-pointer">
   <div class="flex items-center justify-center h-56 bg-amber-50 p-4 shrink-0">
     <img [src]="book().cover" [alt]="book().name" class="h-44 w-auto object-contain" />
   </div>
@@ -9,4 +9,4 @@
       <span class="font-bold text-amber-700 text-base">${{ book().price }}</span>
     </div>
   </div>
-</div>
+</a>
