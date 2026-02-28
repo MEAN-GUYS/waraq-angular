@@ -1,8 +1,9 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { BookCard } from '../book-card/book-card';
 import { Book } from '../../models/books';
+import { TopAuthor } from '../../models/author';
 import BooksService from '../../services/books';
 import { HeroComponent } from '../../hero/hero';
 
@@ -15,15 +16,26 @@ import { HeroComponent } from '../../hero/hero';
 export class HomePage implements OnInit {
   private readonly booksService = inject(BooksService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly changeDetector = inject(ChangeDetectorRef);
 
-  topRateBooks: Book[] = [];
+  topBoughtBooks: Book[] = [];
+  topAuthors: TopAuthor[] = [];
 
   ngOnInit(): void {
     this.booksService
-      .getBooks()
+      .getTopBoughtBooks(12)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((data) => {
-        this.topRateBooks = data.results;
+      .subscribe((books) => {
+        this.topBoughtBooks = books;
+        this.changeDetector.detectChanges();
+      });
+
+    this.booksService
+      .getTopAuthors(6)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((authors) => {
+        this.topAuthors = authors;
+        this.changeDetector.detectChanges();
       });
   }
 }

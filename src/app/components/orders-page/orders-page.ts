@@ -1,5 +1,5 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, DestroyRef, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import OrdersService, { Order } from '../../services/orders';
@@ -16,6 +16,7 @@ export class OrdersPage implements OnInit {
   private readonly ordersService = inject(OrdersService);
   private readonly reviewService = inject(ReviewService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly platformId = inject(PLATFORM_ID);
 
   orders: Order[] = [];
   expandedOrder: string | null = null;
@@ -27,6 +28,11 @@ export class OrdersPage implements OnInit {
   reviewData: Record<string, { rating: number; review: string; liked: boolean | null }> = {};
 
   ngOnInit(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      this.isLoading = false;
+      return;
+    }
+
     this.ordersService
       .getOrders()
       .pipe(takeUntilDestroyed(this.destroyRef))

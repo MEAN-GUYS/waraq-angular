@@ -4,6 +4,13 @@ export interface Author {
     bio?: string;
 }
 
+export interface TopAuthor {
+    id: string;
+    name: string;
+    bio?: string;
+    totalSold: number;
+}
+
 export interface AuthorsResponse {
     results: Author[];
     page: number;

@@ -1,5 +1,6 @@
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/auth-service';
 import { Router } from '@angular/router';
@@ -12,6 +13,8 @@ export const authInterceptor: HttpInterceptorFn = (
 ) => {
     const authService = inject(AuthService);
     const router = inject(Router);
+    const platformId = inject(PLATFORM_ID);
+    const isBrowser = isPlatformBrowser(platformId);
 
     // Skip auth endpoints to avoid infinite loops
     const isAuthRequest = AUTH_PATHS.some((path) => req.url.includes(path));
@@ -27,7 +30,7 @@ export const authInterceptor: HttpInterceptorFn = (
 
     return next(authReq).pipe(
         catchError((error: HttpErrorResponse) => {
-            if (error.status === 401) {
+            if (error.status === 401 && isBrowser) {
                 const refreshToken = authService.getRefreshToken();
 
                 if (!refreshToken) {

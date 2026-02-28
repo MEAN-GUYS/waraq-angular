@@ -22,6 +22,7 @@ export class NavbarComponent {
   readonly user$ = this.isLoggedIn$.pipe(
     map((loggedIn): User | null => (loggedIn ? this.authService.getUser() : null))
   );
+  readonly isAdmin$ = this.user$.pipe(map(user => user?.role === 'admin'));
   readonly cartCount$ = this.cartService.count$;
 
   logout(): void {

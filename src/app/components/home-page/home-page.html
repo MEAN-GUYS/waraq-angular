@@ -1,15 +1,33 @@
 <app-hero />
-<section class="py-10 px-8 bg-gray-50">
+
+<!-- Top Bought Books -->
+<section id="featured-picks" class="py-10 px-8 bg-gray-50">
   <div class="flex justify-between items-start mb-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-800">Popular Books</h1>
-      <p class="text-gray-400 text-sm">Most loved by our readers this month</p>
+      <h1 class="text-2xl font-bold text-gray-800">Top Bought Books</h1>
+      <p class="text-gray-400 text-sm">Our readers' most purchased titles</p>
     </div>
     <a routerLink="/books" class="text-amber-700 text-sm font-medium cursor-pointer hover:underline">View All →</a>
   </div>
-  <div class="flex gap-6 overflow-x-auto pb-4">
-    @for (book of topRateBooks; track book.id) {
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+    @for (book of topBoughtBooks; track book.id) {
       <app-book-card [book]="book" />
+    }
+  </div>
+</section>
+
+<!-- Top Authors -->
+<section class="py-10 px-8">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Top Authors</h1>
+    <p class="text-gray-400 text-sm">Authors with the most book sales</p>
+  </div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+    @for (author of topAuthors; track author.id) {
+      <a [routerLink]="['/books']" [queryParams]="{ author: author.id }" class="flex flex-col items-center p-5 bg-white rounded-xl border border-gray-100 hover:shadow-lg hover:border-amber-200 transition-all duration-300 cursor-pointer no-underline">
+        <h3 class="text-gray-800 font-semibold text-sm text-center">{{ author.name }}</h3>
+        <span class="text-gray-400 text-xs mt-1">{{ author.totalSold }} books sold</span>
+      </a>
     }
   </div>
 </section>

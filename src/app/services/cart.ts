@@ -1,11 +1,12 @@
-import { Injectable, signal} from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 export interface CartItem {
   book: string;
   quantity: number;
-  name: string; 
+  name: string;
   price: number;
 }
 
@@ -14,11 +15,14 @@ export interface CartItem {
 })
 export class CartService {
   private apiUrl = environment.apiUrl;
+  private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   items = signal<CartItem[]>([]);
 
   constructor(private http: HttpClient) {
-    this.loadCart();
+    if (this.isBrowser) {
+      this.loadCart();
+    }
   }
 
   loadCart() {

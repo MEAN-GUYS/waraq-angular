@@ -1,15 +1,20 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import BooksService from '../../services/books';
 import { AuthorService } from '../../services/author.service';
 import { UserService } from '../../services/user.service';
+import { CategoryService } from '../../services/category.service';
+import OrdersService, { Order } from '../../services/orders';
 import { Book } from '../../models/books';
 import { Author } from '../../models/author';
+import { Category } from '../../models/category';
 import { User } from '../../models/registration';
-import { Order } from '../../models/order';
 import { forkJoin } from 'rxjs';
+
+type ModalType = 'book' | 'author' | 'category' | 'order' | 'user' | null;
 
 @Component({
   selector: 'app-admin-page',
@@ -32,10 +37,45 @@ export class AdminPage implements OnInit {
   private readonly bookService = inject(BooksService);
   private readonly authorService = inject(AuthorService);
   private readonly userService = inject(UserService);
+  private readonly categoryService = inject(CategoryService);
+  private readonly orderService = inject(OrdersService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  currentView: 'dashboard' | 'books' | 'authors' | 'users' | 'orders' = 'dashboard';
-  isDeleteUserDialogOpen = false;
-  pendingDeleteUser: User | null = null;
+  private static readonly VIEW_KEY = 'admin_current_view';
+  private static readonly VALID_VIEWS = ['dashboard', 'books', 'authors', 'users', 'orders', 'categories'];
+
+  currentView: 'dashboard' | 'books' | 'authors' | 'users' | 'orders' | 'categories' = this.restoreView();
+
+  // Generic delete dialog
+  isDeleteDialogOpen = false;
+  deleteTarget: { type: 'book' | 'author' | 'category' | 'user'; id: string; name: string } | null = null;
+  isDeleting = false;
+
+  // Modal state
+  activeModal: ModalType = null;
+  isEditing = false;
+  isSaving = false;
+
+  // Book form
+  bookForm = { name: '', description: '', price: 0, stock: 0, authorId: '', categoryId: '' };
+  bookCoverFile: File | null = null;
+  editingBookId = '';
+
+  // Author form
+  authorForm = { name: '', bio: '' };
+  editingAuthorId = '';
+
+  // Category form
+  categoryForm = { name: '' };
+  editingCategoryId = '';
+
+  // Order form
+  orderForm = { shippingStatus: '', paymentStatus: '' };
+  editingOrderId = '';
+
+  // User form
+  userForm = { name: '', email: '', role: '' };
+  editingUserId = '';
 
   private toFiniteNumber(value: unknown, fallback = 0): number {
     const num = typeof value === 'number' ? value : Number(value);
@@ -53,25 +93,26 @@ export class AdminPage implements OnInit {
   // Data
   books: Book[] = [];
   authors: Author[] = [];
+  categories: Category[] = [];
   users = signal<User[]>([]);
   orders = signal<Order[]>([]);
 
   // Feedback
   notification: { message: string, type: 'success' | 'error' | null } = { message: '', type: null };
   notificationTimeoutId?: number;
-  isDeletingUser = false;
 
   ngOnInit(): void {
     this.loadDashboardData();
     this.loadBooks();
     this.loadAuthors();
+    this.loadCategories();
     this.loadUsers();
+    this.loadOrders();
   }
 
   loadDashboardData(): void {
     forkJoin({
       books: this.bookService.getBooks({ limit: 1 }),
-      authors: this.authorService.getAuthors({ limit: 1 }),
       users: this.userService.getUsers({ limit: 1 })
     }).subscribe({
       next: (res) => {
@@ -83,141 +124,359 @@ export class AdminPage implements OnInit {
   }
 
   loadBooks(): void {
-    this.bookService.getBooks({ limit: 5 }).subscribe({
+    this.bookService.getBooks({ limit: 50 }).subscribe({
       next: res => this.books = res.results,
-      error: err => {
-        console.error('Failed to load books:', err);
+      error: () => {
         this.books = [];
-        this.showNotification('Failed to load books. Please try again.');
+        this.showNotification('Failed to load books');
       }
     });
   }
 
   loadAuthors(): void {
-    this.authorService.getAuthors({ limit: 10 }).subscribe({
+    this.authorService.getAuthors({ limit: 50 }).subscribe({
       next: res => this.authors = res.results,
-      error: err => {
-        console.error('Failed to load authors:', err);
+      error: () => {
         this.authors = [];
-        this.showNotification('Failed to load authors. Please try again.');
+        this.showNotification('Failed to load authors');
+      }
+    });
+  }
+
+  loadCategories(): void {
+    this.categoryService.getCategories({ limit: 50 }).subscribe({
+      next: res => this.categories = res.results,
+      error: () => {
+        this.categories = [];
+        this.showNotification('Failed to load categories');
       }
     });
   }
 
   loadUsers(): void {
-    this.userService.getUsers({ limit: 10 }).subscribe({
+    this.userService.getUsers({ limit: 50 }).subscribe({
       next: res => this.users.set(res.results),
-      error: err => {
-        console.error('Failed to load users:', err);
+      error: () => {
         this.users.set([]);
-        this.showNotification('Failed to load users. Please try again.');
+        this.showNotification('Failed to load users');
       }
     });
   }
 
-  setView(view: 'dashboard' | 'books' | 'authors' | 'users' | 'orders'): void {
-    this.currentView = view;
+  loadOrders(): void {
+    this.orderService.getAllOrders().subscribe({
+      next: res => this.orders.set(res.results),
+      error: () => {
+        this.orders.set([]);
+        this.showNotification('Failed to load orders');
+      }
+    });
   }
 
-  deleteBook(id: string): void {
-    if (confirm('Are you sure you want to delete this book?')) {
-      this.bookService.deleteBook(id).subscribe({
-        next: () => {
-          this.loadBooks();
-          // Keep dashboard total in sync without needing a manual refresh.
-          this.totalBooks.update((prev) => Math.max(0, prev - 1));
-        },
-        error: (err) => console.error(err),
-      });
+  setView(view: typeof this.currentView): void {
+    this.currentView = view;
+    if (this.isBrowser) localStorage.setItem(AdminPage.VIEW_KEY, view);
+  }
+
+  private restoreView(): typeof this.currentView {
+    if (!this.isBrowser) return 'dashboard';
+    const saved = localStorage.getItem(AdminPage.VIEW_KEY);
+    return saved && AdminPage.VALID_VIEWS.includes(saved) ? saved as typeof this.currentView : 'dashboard';
+  }
+
+  // ── Modal controls ──
+
+  openModal(type: ModalType): void {
+    this.activeModal = type;
+    this.isEditing = false;
+    this.isSaving = false;
+    this.resetForms();
+  }
+
+  closeModal(): void {
+    if (this.isSaving) return;
+    this.activeModal = null;
+    this.isEditing = false;
+    this.resetForms();
+  }
+
+  private resetForms(): void {
+    this.bookForm = { name: '', description: '', price: 0, stock: 0, authorId: '', categoryId: '' };
+    this.bookCoverFile = null;
+    this.editingBookId = '';
+    this.authorForm = { name: '', bio: '' };
+    this.editingAuthorId = '';
+    this.categoryForm = { name: '' };
+    this.editingCategoryId = '';
+    this.orderForm = { shippingStatus: '', paymentStatus: '' };
+    this.editingOrderId = '';
+    this.userForm = { name: '', email: '', role: '' };
+    this.editingUserId = '';
+  }
+
+  // ── Book CRUD ──
+
+  onAddBook(): void {
+    this.openModal('book');
+  }
+
+  editBook(book: Book): void {
+    this.activeModal = 'book';
+    this.isEditing = true;
+    this.editingBookId = book.id;
+    this.bookForm = {
+      name: book.name,
+      description: book.description || '',
+      price: book.price,
+      stock: book.stock,
+      authorId: book.author?.id || book.author || '',
+      categoryId: book.category?.id || book.category || ''
+    };
+  }
+
+  onBookFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files?.length) {
+      this.bookCoverFile = input.files[0];
     }
   }
 
-  deleteUser(id: string): void {
-    this.isDeletingUser = true;
-    this.userService.deleteUser(id).subscribe({
+  saveBook(): void {
+    this.isSaving = true;
+    const fd = new FormData();
+    fd.append('name', this.bookForm.name);
+    fd.append('description', this.bookForm.description);
+    fd.append('price', String(this.bookForm.price));
+    fd.append('stock', String(this.bookForm.stock));
+    if (this.bookForm.authorId) fd.append('author', this.bookForm.authorId);
+    if (this.bookForm.categoryId) fd.append('category', this.bookForm.categoryId);
+    if (this.bookCoverFile) fd.append('cover', this.bookCoverFile);
+
+    const req$ = this.isEditing
+      ? this.bookService.updateBook(this.editingBookId, fd)
+      : this.bookService.createBook(fd);
+
+    req$.subscribe({
       next: () => {
-        this.showNotification('User deleted successfully', 'success');
-        this.users.update(prev => prev.filter(u => u.id !== id));
-        this.totalUsers.update((prev) => Math.max(0, prev - 1));
-        this.isDeletingUser = false;
-        this.closeDeleteUserDialog();
+        const wasEditing = this.isEditing;
+        this.showNotification(wasEditing ? 'Book updated' : 'Book created', 'success');
+        this.isSaving = false;
+        this.closeModal();
+        this.loadBooks();
+        if (!wasEditing) this.totalBooks.update(v => v + 1);
       },
       error: (err) => {
-        this.showNotification('Failed to delete user', 'error');
-        console.error(err);
-        this.isDeletingUser = false;
+        this.isSaving = false;
+        this.showNotification(err.error?.message || 'Failed to save book');
       }
     });
   }
 
-  requestDeleteUser(user: User): void {
-    if (this.isDeletingUser) return;
-    this.pendingDeleteUser = user;
-    this.isDeleteUserDialogOpen = true;
+  deleteBook(book: Book): void {
+    this.requestDelete('book', book.id, book.name);
   }
 
-  closeDeleteUserDialog(): void {
-    if (this.isDeletingUser) return;
-    this.isDeleteUserDialogOpen = false;
-    this.pendingDeleteUser = null;
+  // ── Author CRUD ──
+
+  onAddAuthor(): void {
+    this.openModal('author');
   }
 
-  confirmDeleteUser(): void {
-    if (!this.pendingDeleteUser || this.isDeletingUser) return;
-    this.deleteUser(this.pendingDeleteUser.id);
+  onEditAuthor(author: Author): void {
+    this.activeModal = 'author';
+    this.isEditing = true;
+    this.editingAuthorId = author.id;
+    this.authorForm = { name: author.name, bio: author.bio || '' };
   }
 
-  showNotification(message: string, type: 'success' | 'error' = 'error'): void {
-    // clear any existing timer
-    if (this.notificationTimeoutId) {
-      clearTimeout(this.notificationTimeoutId);
+  saveAuthor(): void {
+    this.isSaving = true;
+    const req$ = this.isEditing
+      ? this.authorService.updateAuthor(this.editingAuthorId, this.authorForm)
+      : this.authorService.createAuthor(this.authorForm);
+
+    req$.subscribe({
+      next: () => {
+        this.showNotification(this.isEditing ? 'Author updated' : 'Author created', 'success');
+        this.isSaving = false;
+        this.closeModal();
+        this.loadAuthors();
+      },
+      error: (err) => {
+        this.isSaving = false;
+        this.showNotification(err.error?.message || 'Failed to save author');
+      }
+    });
+  }
+
+  onDeleteAuthor(author: Author): void {
+    this.requestDelete('author', author.id, author.name);
+  }
+
+  // ── Category CRUD ──
+
+  onAddCategory(): void {
+    this.openModal('category');
+  }
+
+  onEditCategory(cat: Category): void {
+    this.activeModal = 'category';
+    this.isEditing = true;
+    this.editingCategoryId = cat.id;
+    this.categoryForm = { name: cat.name };
+  }
+
+  saveCategory(): void {
+    this.isSaving = true;
+    const req$ = this.isEditing
+      ? this.categoryService.updateCategory(this.editingCategoryId, this.categoryForm)
+      : this.categoryService.createCategory(this.categoryForm);
+
+    req$.subscribe({
+      next: () => {
+        this.showNotification(this.isEditing ? 'Category updated' : 'Category created', 'success');
+        this.isSaving = false;
+        this.closeModal();
+        this.loadCategories();
+      },
+      error: (err) => {
+        this.isSaving = false;
+        this.showNotification(err.error?.message || 'Failed to save category');
+      }
+    });
+  }
+
+  onDeleteCategory(cat: Category): void {
+    this.requestDelete('category', cat.id, cat.name);
+  }
+
+  // ── Order status update ──
+
+  updateOrderStatus(order: Order): void {
+    this.activeModal = 'order';
+    this.isEditing = true;
+    this.editingOrderId = order.id;
+    this.orderForm = {
+      shippingStatus: order.shippingStatus,
+      paymentStatus: order.paymentStatus
+    };
+  }
+
+  saveOrderStatus(): void {
+    this.isSaving = true;
+    this.orderService.updateOrderStatus(this.editingOrderId, this.orderForm).subscribe({
+      next: () => {
+        this.showNotification('Order updated', 'success');
+        this.isSaving = false;
+        this.closeModal();
+        this.loadOrders();
+      },
+      error: (err) => {
+        this.isSaving = false;
+        this.showNotification(err.error?.message || 'Failed to update order');
+      }
+    });
+  }
+
+  // ── User edit ──
+
+  onEditUser(user: User): void {
+    this.activeModal = 'user';
+    this.isEditing = true;
+    this.editingUserId = user.id;
+    this.userForm = { name: user.name, email: user.email, role: user.role };
+  }
+
+  saveUser(): void {
+    this.isSaving = true;
+    this.userService.updateUser(this.editingUserId, this.userForm).subscribe({
+      next: () => {
+        this.showNotification('User updated', 'success');
+        this.isSaving = false;
+        this.closeModal();
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.isSaving = false;
+        this.showNotification(err.error?.message || 'Failed to update user');
+      }
+    });
+  }
+
+  // ── Generic delete dialog ──
+
+  requestDelete(type: 'book' | 'author' | 'category' | 'user', id: string, name: string): void {
+    if (this.isDeleting) return;
+    this.deleteTarget = { type, id, name };
+    this.isDeleteDialogOpen = true;
+  }
+
+  closeDeleteDialog(): void {
+    if (this.isDeleting) return;
+    this.isDeleteDialogOpen = false;
+    this.deleteTarget = null;
+  }
+
+  confirmDelete(): void {
+    if (!this.deleteTarget || this.isDeleting) return;
+    this.isDeleting = true;
+    const { type, id } = this.deleteTarget;
+
+    let req$;
+    switch (type) {
+      case 'book':
+        req$ = this.bookService.deleteBook(id);
+        break;
+      case 'author':
+        req$ = this.authorService.deleteAuthor(id);
+        break;
+      case 'category':
+        req$ = this.categoryService.deleteCategory(id);
+        break;
+      case 'user':
+        req$ = this.userService.deleteUser(id);
+        break;
     }
 
+    req$.subscribe({
+      next: () => {
+        const label = type.charAt(0).toUpperCase() + type.slice(1);
+        this.showNotification(`${label} deleted`, 'success');
+        this.isDeleting = false;
+        this.closeDeleteDialog();
+
+        switch (type) {
+          case 'book':
+            this.loadBooks();
+            this.totalBooks.update(v => Math.max(0, v - 1));
+            break;
+          case 'author':
+            this.loadAuthors();
+            break;
+          case 'category':
+            this.loadCategories();
+            break;
+          case 'user':
+            this.users.update(prev => prev.filter(u => u.id !== id));
+            this.totalUsers.update(v => Math.max(0, v - 1));
+            break;
+        }
+      },
+      error: (err) => {
+        this.showNotification(err.error?.message || `Failed to delete ${type}`);
+        this.isDeleting = false;
+      }
+    });
+  }
+
+  // ── Notification ──
+
+  showNotification(message: string, type: 'success' | 'error' = 'error'): void {
+    if (this.notificationTimeoutId) clearTimeout(this.notificationTimeoutId);
     this.notification = { message, type };
     this.notificationTimeoutId = setTimeout(() => {
       this.notification = { message: '', type: null };
       this.notificationTimeoutId = undefined;
     }, 3000) as unknown as number;
-  }
-
-  // Edit/Update actions
-  editBook(book: Book): void {
-    // todo: implement edit modal or navigate to edit page
-    this.showNotification('Edit book feature coming soon', 'error');
-  }
-
-  updateOrderStatus(orderId: string): void {
-    // todo: implement order status update
-    this.showNotification('Order status update coming soon', 'error');
-  }
-
-  // Add handlers
-  onAddBook(): void {
-    // todo: open add book modal or navigate to add page
-    this.showNotification('Add book feature coming soon', 'error');
-  }
-
-  onAddAuthor(): void {
-    // todo: open add author modal
-    this.showNotification('Add author feature coming soon', 'error');
-  }
-
-  // Edit handlers
-  onEditAuthor(author: Author): void {
-    // todo: open edit author modal
-    this.showNotification('Edit author feature coming soon', 'error');
-  }
-
-  onEditUser(user: User): void {
-    // todo: open edit user modal
-    this.showNotification('Edit user feature coming soon', 'error');
-  }
-
-  // Delete handlers
-  onDeleteAuthor(author: Author): void {
-    if (confirm(`Delete author ${author.name}?`)) {
-      // todo: implement author deletion
-      this.showNotification('Delete author feature coming soon', 'error');
-    }
   }
 }

@@ -52,7 +52,8 @@ export class Login {
                 const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
                 // prevent //evil.com attacks
                 const isSafeUrl = returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//');
-                const safeReturnUrl = isSafeUrl ? returnUrl : '/';
+                const isAdmin = this.authService.getRole() === 'admin';
+                const safeReturnUrl = isSafeUrl ? returnUrl : (isAdmin ? '/admin' : '/');
                 this.router.navigateByUrl(safeReturnUrl);
                 this.cdr.detectChanges();
             },

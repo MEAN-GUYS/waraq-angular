@@ -1,21 +1,30 @@
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import BooksService from '../../services/books';
 import { Book, BooksParams } from '../../models/books';
+import { BookCard } from '../book-card/book-card';
+import { Category } from '../../models/category';
+import { Author } from '../../models/author';
+import { CategoryService } from '../../services/category.service';
+import { AuthorService } from '../../services/author.service';
 
 type SortOption = 'relevance' | 'priceAsc' | 'priceDesc' | 'nameAsc' | 'nameDesc';
 
 @Component({
   selector: 'app-books-page',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, BookCard],
   templateUrl: './books-page.html',
   styleUrl: './books-page.css',
 })
 export class BooksPage implements OnInit {
-  booksService = inject(BooksService);
-  destroyRef = inject(DestroyRef);
+  private readonly booksService = inject(BooksService);
+  private readonly categoryService = inject(CategoryService);
+  private readonly authorService = inject(AuthorService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly route = inject(ActivatedRoute);
+
   booksState = signal<Book[]>([]);
   isLoadingState = signal(false);
   errorMessageState = signal('');
@@ -30,14 +39,32 @@ export class BooksPage implements OnInit {
   totalPagesState = signal(1);
   totalResultsState = signal(0);
 
-  // Placeholders — will be fetched from API once backend is ready
-  categories: string[] = [];
+  categories: Category[] = [];
   selectedCategories: string[] = [];
-  authors: any[] = [];
-
+  authors: Author[] = [];
+  selectedAuthors: string[] = [];
 
   ngOnInit(): void {
-    this.fetchBooks();
+    this.categoryService.getCategories({ limit: 100 })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => this.categories = data.results);
+
+    this.authorService.getAuthors({ limit: 100 })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => this.authors = data.results);
+
+    // Read query params (e.g. from home page author click)
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        if (params['author']) {
+          this.selectedAuthors = [params['author']];
+        }
+        if (params['category']) {
+          this.selectedCategories = [params['category']];
+        }
+        this.fetchBooks();
+      });
   }
 
   fetchBooks(): void {
@@ -51,6 +78,8 @@ export class BooksPage implements OnInit {
       minPrice: this.minPrice ? Number(this.minPrice) : undefined,
       maxPrice: this.maxPrice ? Number(this.maxPrice) : undefined,
       sortBy: this.mapSort(this.sortOption),
+      author: this.selectedAuthors[0] || undefined,
+      category: this.selectedCategories[0] || undefined,
     };
 
     this.booksService
@@ -82,6 +111,8 @@ export class BooksPage implements OnInit {
     this.minPrice = '';
     this.maxPrice = '';
     this.sortOption = 'relevance';
+    this.selectedCategories = [];
+    this.selectedAuthors = [];
     this.pageState.set(1);
     this.fetchBooks();
   }
@@ -103,12 +134,22 @@ export class BooksPage implements OnInit {
     if (event.key === 'Enter') this.applyFilters();
   }
 
-  onCategoryChange(_category: string, _checked: boolean): void {
-    // TODO: wire up when backend supports category filtering
+  onCategoryChange(categoryId: string, checked: boolean): void {
+    if (checked) {
+      this.selectedCategories.push(categoryId);
+    } else {
+      this.selectedCategories = this.selectedCategories.filter(id => id !== categoryId);
+    }
+    this.applyFilters();
   }
 
-  onAuthorChange(_index: number, _checked: boolean): void {
-    // TODO: wire up when backend supports author filtering
+  onAuthorChange(authorId: string, checked: boolean): void {
+    if (checked) {
+      this.selectedAuthors.push(authorId);
+    } else {
+      this.selectedAuthors = this.selectedAuthors.filter(id => id !== authorId);
+    }
+    this.applyFilters();
   }
 
   authorName(_book: Book): string {

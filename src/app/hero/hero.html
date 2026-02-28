@@ -4,8 +4,8 @@
     <h1>Your Next Favorite <br>Book Lives Here</h1>
     <p>Waraq.. A Universe Between pages where stories find you!</p>
     <div class="hero-buttons">
-      <button class="btn-primary">Browse Collection</button>
-      <button class="btn-secondary">Featured Picks</button>
+      <a routerLink="/books" class="btn-primary">Browse Collection</a>
+      <button (click)="scrollToFeatured()" class="btn-secondary">Featured Picks</button>
     </div>
   </div>
   <div class="hero-image">

@@ -6,15 +6,15 @@
       <div class="mt-5">
         <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Categories</p>
         <div class="space-y-2">
-          @for (category of categories; track category) {
+          @for (category of categories; track category.id) {
             <label class="flex items-center gap-2 text-sm text-slate-600">
               <input
                 type="checkbox"
                 class="h-3.5 w-3.5 rounded border-slate-300"
-                [checked]="selectedCategories.includes(category)"
-                (change)="onCategoryChange(category, $any($event.target).checked)"
+                [checked]="selectedCategories.includes(category.id)"
+                (change)="onCategoryChange(category.id, $any($event.target).checked)"
               />
-              {{ category }}
+              {{ category.name }}
             </label>
           }
         </div>
@@ -23,13 +23,13 @@
       <div class="mt-5">
         <p class="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">Authors</p>
         <div class="space-y-2">
-          @for (author of authors; track author.name; let i = $index) {
+          @for (author of authors; track author.id) {
             <label class="flex items-center gap-2 text-sm text-slate-600">
               <input
                 type="checkbox"
                 class="h-3.5 w-3.5 rounded border-slate-300"
-                [checked]="author.checked"
-                (change)="onAuthorChange(i, $any($event.target).checked)"
+                [checked]="selectedAuthors.includes(author.id)"
+                (change)="onAuthorChange(author.id, $any($event.target).checked)"
               />
               {{ author.name }}
             </label>
@@ -113,31 +113,9 @@
       } @else if (booksState().length === 0) {
         <div class="rounded-lg border border-dashed border-[#d8ccb8] bg-white/70 p-8 text-center text-sm text-slate-500">No books found for the current filters.</div>
       } @else {
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           @for (book of booksState(); track book.id) {
-            <a [routerLink]="[book.id]" class="overflow-hidden rounded-lg border border-[#e8dfd0] bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] cursor-pointer">
-              <div class="flex h-28 items-center justify-center bg-[#f7f1e4] p-4">
-                <img [src]="book.cover" [alt]="book.name" class="h-20 w-auto object-contain" />
-              </div>
-              <div class="p-3">
-                <h3 class="line-clamp-1 text-[18px] font-semibold leading-5 text-[#25314c]">{{ book.name }}</h3>
-                <p class="mt-1 line-clamp-1 text-xs text-slate-400">{{ authorName(book) }}</p>
-
-                <div class="mt-2 flex items-center justify-between">
-                  <div class="flex items-center gap-1">
-                    <span class="text-[10px] tracking-[1px] text-[#d2a33a]">{{ stars(book) }}</span>
-                    <span class="text-[11px] text-slate-400">{{ rating(book) }}</span>
-                  </div>
-                  <span class="text-sm font-semibold text-[#25314c]">${{ formatPrice(book.price) }}</span>
-                </div>
-
-                @if (isOutOfStock(book)) {
-                  <span class="mt-2 inline-flex items-center rounded-full bg-[#ffe4d6] px-2 py-0.5 text-[10px] font-semibold text-[#cf5b34]">
-                    Out of Stock
-                  </span>
-                }
-              </div>
-            </a>
+            <app-book-card [book]="book" />
           }
         </div>
       }

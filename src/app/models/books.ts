@@ -23,7 +23,9 @@ export interface BooksParams {
     name?: string,
     minPrice?:number,
     maxPrice?:number,
-    sortBy?:string, 
+    sortBy?:string,
     limit?:number
     page?:number
+    author?: string,
+    category?: string,
 }

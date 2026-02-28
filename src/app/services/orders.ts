@@ -40,4 +40,12 @@ export default class OrdersService {
   getOrders(): Observable<{ results: Order[] }> {
     return this.http.get<{ results: Order[] }>(`${this.apiUrl}/orders/myorders`);
   }
+
+  getAllOrders(): Observable<{ results: Order[] }> {
+    return this.http.get<{ results: Order[] }>(`${this.apiUrl}/orders/all`);
+  }
+
+  updateOrderStatus(id: string, body: { shippingStatus?: string; paymentStatus?: string }): Observable<Order> {
+    return this.http.patch<Order>(`${this.apiUrl}/orders/${id}`, body);
+  }
 }

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Book, BooksParams, BooksResponse } from '../models/books';
+import { TopAuthor } from '../models/author';
 
 @Injectable({
   providedIn: 'root',
@@ -39,6 +40,17 @@ export default class BooksService {
 
   deleteBook(id: string): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/books/${id}`);
+  }
 
+  getTopBoughtBooks(limit: number = 10): Observable<Book[]> {
+    return this.http.get<Book[]>(`${environment.apiUrl}/books/top-bought`, {
+      params: { limit: limit.toString() }
+    });
+  }
+
+  getTopAuthors(limit: number = 10): Observable<TopAuthor[]> {
+    return this.http.get<TopAuthor[]>(`${environment.apiUrl}/books/top-authors`, {
+      params: { limit: limit.toString() }
+    });
   }
 }

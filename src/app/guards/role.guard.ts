@@ -24,5 +24,5 @@ export const roleGuard = (allowedRoles: string[]): CanActivateFn => (_route, sta
 };
 
 export const adminGuard: CanActivateFn = roleGuard(['admin']);
-export const userGuard: CanActivateFn = roleGuard(['user']);
+export const userGuard: CanActivateFn = roleGuard(['user', 'admin']);
 

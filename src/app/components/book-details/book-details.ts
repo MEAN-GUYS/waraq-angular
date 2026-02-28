@@ -31,7 +31,7 @@ export class BookDetails {
       });
 
       this.reviewService.getBookReviews(bookId).subscribe({
-        next: (data) => this.reviews.set(data)
+        next: (data) => this.reviews.set(data.results)
       });
     }
   }

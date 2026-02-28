@@ -32,7 +32,7 @@ export class ReviewService {
     return this.http.post<Review>(`${this.apiUrl}/reviews`, body, this.getHeaders());
   }
 
-  getBookReviews(bookId: string): Observable<Review[]> {
-    return this.http.get<Review[]>(`${this.apiUrl}/reviews/book/${bookId}`);
+  getBookReviews(bookId: string): Observable<{ results: Review[] }> {
+    return this.http.get<{ results: Review[] }>(`${this.apiUrl}/reviews?book=${bookId}`);
   }
 }

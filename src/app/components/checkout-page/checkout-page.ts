@@ -102,14 +102,14 @@ export class CheckoutPage implements OnInit {
   placeOrder() {
     this.isPlacingOrder = true;
     const orderBody = {
-      items: this.currentItems.map((item: any) => ({
-        book: item.productId,
-        quantity: item.quantity,
-        price: item.price || 0
-      })),
-      total: this.total,
-      address: this.address,
-      paymentMethod: this.paymentMethod
+      address: {
+        fullName: this.address.fullName,
+        street: this.address.street,
+        city: this.address.city,
+        country: this.address.country,
+        phone: this.address.phone,
+      },
+      paymentMethod: this.paymentMethod === 'cash' ? 'COD' : 'card',
     };
 
     this.http.post(`${environment.apiUrl}/orders`, orderBody, this.getHeaders())
