@@ -15,9 +15,9 @@
           <span class="order-date">{{ order.createdAt | date:'MMM d, y' }}</span>
         </div>
         <div class="order-right">
-          <span class="order-total">${{ order.total.toFixed(2) }}</span>
-          <span class="status-badge" [ngClass]="getStatusClass(order.status)">
-            {{ order.status }}
+          <span class="order-total">${{ order.totalPrice.toFixed(2) }}</span>
+          <span class="status-badge" [ngClass]="getStatusClass(order.shippingStatus)">
+            {{ order.shippingStatus }}
           </span>
           <span class="chevron" [class.open]="expandedOrder === order.id">›</span>
         </div>
@@ -25,77 +25,31 @@
 
       <div class="order-body" [class.expanded]="expandedOrder === order.id">
 
-        <div class="tracking-section">
-          <div class="tracking-info">
-            <span class="tracking-label">Tracking Number</span>
-            <span class="tracking-number">{{ order.trackingNumber }}</span>
-          </div>
-          <div class="tracking-info">
-            <span class="tracking-label">Estimated Delivery</span>
-            <span class="tracking-number">{{ order.estimatedDelivery | date:'MMM d, y' }}</span>
-          </div>
-        </div>
-
         <div class="progress-track">
           <div class="progress-step"
-               *ngFor="let step of ['Processing', 'Shipped', 'Out for Delivery', 'Delivered']; let i = index"
-               [class.active]="getStatusStep(order.status) > i"
-               [class.current]="getStatusStep(order.status) === i + 1">
+               *ngFor="let step of ['processing', 'out for delivery', 'delivered']; let i = index"
+               [class.active]="getStatusStep(order.shippingStatus) > i"
+               [class.current]="getStatusStep(order.shippingStatus) === i + 1">
             <div class="step-dot"></div>
             <span class="step-label">{{ step }}</span>
           </div>
           <div class="progress-line">
-            <div class="progress-fill" [style.width.%]="(getStatusStep(order.status) - 1) * 33.33"></div>
+            <div class="progress-fill" [style.width.%]="(getStatusStep(order.shippingStatus) - 1) * 50"></div>
           </div>
         </div>
 
         <div class="order-items">
           <div class="order-item" *ngFor="let item of order.items">
             <div class="item-left">
-              <div class="item-cover">📕</div>
+              <img [src]="item.cover" alt="cover" class="item-cover" *ngIf="item.cover" />
+              <div class="item-cover" *ngIf="!item.cover">📕</div>
               <div class="item-info">
-                <h4>{{ item.book.name }}</h4>
-                <p>{{ item.book.author }}</p>
+                <h4>{{ item.name }}</h4>
                 <span class="item-qty">Qty: {{ item.quantity }}</span>
               </div>
             </div>
             <div class="item-right">
               <span class="item-price">${{ (item.price * item.quantity).toFixed(2) }}</span>
-
-              <div *ngIf="order.status === 'Delivered'">
-                <button class="btn-review" (click)="toggleReview(item.id)">
-                  {{ reviewingItem === item.id ? 'Cancel' : item.rating ? 'Edit Review' : 'Leave a Review' }}
-                </button>
-
-                <div class="stars-display" *ngIf="item.rating && reviewingItem !== item.id">
-                  <span *ngFor="let s of [1,2,3,4,5]" class="star" [class.filled]="s <= item.rating!">★</span>
-                </div>
-
-                <div class="review-form" *ngIf="reviewingItem === item.id">
-                  <div class="stars-input">
-                    <span *ngFor="let s of [1,2,3,4,5]"
-                          class="star"
-                          [class.filled]="s <= (item.rating || 0)"
-                          (click)="setRating(item, s)">★</span>
-                  </div>
-                  <textarea class="review-text"
-                            [(ngModel)]="item.review"
-                            placeholder="Share your thoughts about this book..."></textarea>
-                  <div class="like-section">
-                    <span class="like-label">Would you recommend it?</span>
-                    <div class="like-buttons">
-                      <button class="like-btn"
-                              [class.active]="item.liked === true"
-                              (click)="setLike(item, true)">👍 Yes</button>
-                      <button class="like-btn dislike"
-                              [class.active]="item.liked === false"
-                              (click)="setLike(item, false)">👎 No</button>
-                    </div>
-                  </div>
-                  <button class="btn-submit" (click)="submitReview(order.id, item)">Submit Review</button>
-                </div>
-              </div>
-
             </div>
           </div>
         </div>

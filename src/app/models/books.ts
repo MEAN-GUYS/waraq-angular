@@ -8,6 +8,7 @@ export interface Book {
     author?: any,
     category?: any
     averageRating?: number,
+    reviewCount?: number
 }
 
 export interface BooksResponse {

@@ -32,6 +32,7 @@ export class Registration {
         email: ['', [Validators.required, this.validators.emailValidator()]],
         password: ['', [Validators.required, this.validators.passwordStrengthValidator()]],
         confirmPassword: ['', Validators.required],
+        dob: ['', Validators.required],
       },
       { validators: this.validators.passwordMatchValidator() }
     );
