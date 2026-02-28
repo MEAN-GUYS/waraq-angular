@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { Book } from '../../models/books';
 import BooksService from '../../services/books';
+import { CartService } from '../../services/cart';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -12,8 +13,11 @@ import { ActivatedRoute } from '@angular/router';
 export class BookDetails {
   activtedRoute = inject(ActivatedRoute);
   bookService = inject(BooksService);
+  cartService = inject(CartService);
+
 
   bookState = signal<Book>({} as Book);
+  isAddingToCart = signal<boolean>(false);
 
   ngOnInit(): void {
     const bookId = this.activtedRoute.snapshot.paramMap.get('id');
@@ -29,6 +33,20 @@ export class BookDetails {
       });
     }
   }
+
+  onAddToCart(): void {
+    const book = this.bookState();
+
+    if (!book || !book.id || book.stock === 0 || this.isAddingToCart()) return;
+
+    this.isAddingToCart.set(true);
+    this.cartService.addToCart(book.id, 1);
+    
+    setTimeout(() => {
+        this.isAddingToCart.set(false);
+    }, 500);
+  }
+
   
   
 }
