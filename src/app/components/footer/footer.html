@@ -1,0 +1,58 @@
+<footer class="footer">
+
+  <div class="footer-top">
+
+    <div class="footer-brand">
+      <div class="brand-logo">
+        <span class="logo-arabic">وَرَق</span>
+        <span class="logo-text">Waraq</span>
+      </div>
+      <p class="brand-tagline">Made with love, pens, and waraq 📖</p>
+      <p class="brand-desc">Your destination for timeless reads and modern discoveries. Browse thousands of titles across every genre.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="col-title">Quick Links</h4>
+      <ul>
+        <li><a routerLink="/">Home</a></li>
+        <li><a routerLink="/books">Books</a></li>
+        <li><a routerLink="/cart">Cart</a></li>
+        <li><a routerLink="/my-orders">My Orders</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="col-title">Company</h4>
+      <ul>
+        <li><span>Open Source · 9 Months</span></li>
+        <li><span>ITI — Smart Village</span></li>
+        <li><span>Cairo, Egypt</span></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="col-title">Our Team</h4>
+      <ul class="team-list">
+        <li *ngFor="let member of team" class="team-member">
+          <span class="member-avatar">{{ member.name.charAt(0) }}</span>
+          <div>
+            <p class="member-name">{{ member.name }}</p>
+            <p class="member-note" *ngIf="member.note">{{ member.note }}</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer-divider"></div>
+
+  <div class="footer-bottom">
+    <p>© {{ currentYear }} Waraq · Built with 🧡 by Waraq Open Source Team · ITI Smart Village</p>
+    <div class="footer-bottom-links">
+      <span>Privacy Policy</span>
+      <span>Terms of Service</span>
+    </div>
+  </div>
+
+</footer>
