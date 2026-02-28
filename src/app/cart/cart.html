@@ -5,8 +5,9 @@
 
   <div class="cart-layout">
     <div class="cart-items">
-      <div class="cart-item" *ngFor="let item of cartService.items">
+      <div class="cart-item" *ngFor="let item of cartService.items()">
         <div class="item-details">
+          <h4 class="font-bold text-lg text-gray-800">{{ item.name }}</h4> 
           <p>Qty: {{ item.quantity }}</p>
           <div class="item-controls">
             <button class="qty-btn" (click)="decrease(item.book)">−</button>
