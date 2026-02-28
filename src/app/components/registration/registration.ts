@@ -1,21 +1,19 @@
 import { Component } from '@angular/core';
 import {
-  FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl,
-  ValidationErrors
+  FormBuilder, FormGroup, Validators, ReactiveFormsModule,
 } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { RegistrationValidators } from '../../services/registration-validators';
-import {RegistrationPayload} from '../../models/registration'
-
+import { RegistrationPayload } from '../../models/registration';
 
 @Component({
   selector: 'app-registration',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './registration.html',
   styleUrl: './registration.css',
 })
 export class Registration {
-
   registerForm: FormGroup;
   submitted = false;
   loading = false;
@@ -24,15 +22,15 @@ export class Registration {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private validators: RegistrationValidators
+    private validators: RegistrationValidators,
+    private router: Router
   ) {
     this.registerForm = this.fb.group(
       {
         firstName: ['', [Validators.required, Validators.minLength(3)]],
-        lastName:  ['', [Validators.required, Validators.minLength(3)]],
-        email:     ['', [Validators.required, this.validators.emailValidator()]],
-        dateOfBirth: ['', Validators.required],
-        password:  ['', [Validators.required, this.validators.passwordStrengthValidator()]],
+        lastName: ['', [Validators.required, Validators.minLength(3)]],
+        email: ['', [Validators.required, this.validators.emailValidator()]],
+        password: ['', [Validators.required, this.validators.passwordStrengthValidator()]],
         confirmPassword: ['', Validators.required],
       },
       { validators: this.validators.passwordMatchValidator() }
@@ -57,10 +55,9 @@ export class Registration {
     const payload: RegistrationPayload = this.registerForm.value;
 
     this.authService.register(payload).subscribe({
-      next: (res) => {
+      next: () => {
         this.loading = false;
-        console.log('Registered successfully:', res);
-        // navigate or show success
+        this.router.navigate(['/']);
       },
       error: (err) => {
         this.loading = false;
