@@ -94,9 +94,31 @@
     </div>
 
     <!-- Right: Reviews -->
-    <div class="w-full lg:w-[380px]">
-      <h2 class="text-lg font-bold text-[#1a1a1a]">Reviews</h2>
-      <p class="mt-3 text-sm text-[#8a8680]">No reviews yet.</p>
+   <div class="w-full lg:w-[380px]">
+  <h2 class="text-lg font-bold text-[#1a1a1a]">Reviews</h2>
+
+  <div *ngIf="reviews().length === 0" class="mt-3 text-sm text-[#8a8680]">
+    No reviews yet. Be the first to review!
+  </div>
+
+  <div class="mt-4 flex flex-col gap-4" *ngIf="reviews().length > 0">
+    <div class="review-card" *ngFor="let review of reviews()">
+      <div class="review-header">
+        <span class="reviewer-name">{{ review.user.name }}</span>
+        <div class="review-stars">
+          <span *ngFor="let s of getStars(review.rating)"
+                class="star"
+                [class.filled]="s <= review.rating">★</span>
+        </div>
+      </div>
+      <p class="review-text">{{ review.review }}</p>
+      <div class="review-footer">
+        <span *ngIf="review.liked === true" class="recommend yes">👍 Recommends</span>
+        <span *ngIf="review.liked === false" class="recommend no">👎 Doesn't recommend</span>
+        <span class="review-date">{{ review.createdAt | date:'MMM d, y' }}</span>
+      </div>
     </div>
+  </div>
+</div>
   </div>
 </div>
