@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { LoginPayload } from '../../models/registration';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
     selector: 'app-login',
@@ -21,7 +22,8 @@ export class Login {
         private authService: AuthService,
         private route: ActivatedRoute,
         private router: Router,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private notify: NotificationService
     ) {
         this.loginForm = this.fb.group({
             email: ['', [Validators.required, Validators.email]],
@@ -38,6 +40,11 @@ export class Login {
 
         if (this.loginForm.invalid) {
             this.loginForm.markAllAsTouched();
+            if (this.f['email'].errors) {
+                this.notify.show('Please enter a valid email address', 'error');
+            } else if (this.f['password'].errors) {
+                this.notify.show('Password is required', 'error');
+            }
             return;
         }
 
@@ -61,6 +68,7 @@ export class Login {
                 this.loading = false;
                 this.errorMessage =
                     err.error?.message ?? 'Login failed. Please check your credentials.';
+                this.notify.show(this.errorMessage, 'error');
                 this.cdr.detectChanges();
             },
         });

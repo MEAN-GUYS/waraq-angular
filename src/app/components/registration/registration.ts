@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { RegistrationValidators } from '../../services/registration-validators';
 import { RegistrationPayload } from '../../models/registration';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-registration',
@@ -24,7 +25,8 @@ export class Registration {
     private fb: FormBuilder,
     private authService: AuthService,
     private validators: RegistrationValidators,
-    private router: Router
+    private router: Router,
+    private notify: NotificationService
   ) {
     this.registerForm = this.fb.group(
       {
@@ -48,6 +50,20 @@ export class Registration {
 
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
+      const f = this.f;
+      if (f['firstName'].errors) {
+        this.notify.show('First name must be at least 3 characters', 'error');
+      } else if (f['lastName'].errors) {
+        this.notify.show('Last name must be at least 3 characters', 'error');
+      } else if (f['email'].errors) {
+        this.notify.show('Please enter a valid email address', 'error');
+      } else if (f['dob'].errors) {
+        this.notify.show('Date of birth is required', 'error');
+      } else if (f['password'].errors) {
+        this.notify.show('Password must be 8+ characters with at least 1 letter and 1 number', 'error');
+      } else if (this.registerForm.errors?.['mismatch']) {
+        this.notify.show('Passwords do not match', 'error');
+      }
       return;
     }
 
@@ -64,6 +80,7 @@ export class Registration {
       error: (err) => {
         this.loading = false;
         this.errorMessage = err.error?.message ?? 'Registration failed. Please try again.';
+        this.notify.show(this.errorMessage, 'error');
       },
     });
   }

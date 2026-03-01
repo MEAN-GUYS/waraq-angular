@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { CartService, CartItem } from '../../services/cart';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-checkout-page',
@@ -17,6 +18,7 @@ export class CheckoutPage {
   private router = inject(Router);
   private http = inject(HttpClient);
   cartService = inject(CartService);
+  private notify = inject(NotificationService);
 
   step = 1;
   isPlacingOrder = false;
@@ -87,7 +89,11 @@ export class CheckoutPage {
       if (!this.address.city.trim()) this.errors['city'] = 'City is required';
       if (!this.address.country.trim()) this.errors['country'] = 'Country is required';
       if (!this.address.phone.trim()) this.errors['phone'] = 'Phone number is required';
-      if (Object.keys(this.errors).length) return;
+      if (Object.keys(this.errors).length) {
+        const first = Object.values(this.errors)[0];
+        this.notify.show(first, 'error');
+        return;
+      }
     }
     if (this.step === 2 && this.paymentMethod === 'card') {
       const num = this.card.number.replace(/\s/g, '');
@@ -95,7 +101,11 @@ export class CheckoutPage {
       if (!this.card.name.trim()) this.errors['cardName'] = 'Cardholder name is required';
       if (!/^\d{2}\/\d{2}$/.test(this.card.expiry)) this.errors['expiry'] = 'Enter expiry as MM/YY';
       if (!/^\d{3}$/.test(this.card.cvv)) this.errors['cvv'] = 'Enter a valid 3-digit CVV';
-      if (Object.keys(this.errors).length) return;
+      if (Object.keys(this.errors).length) {
+        const first = Object.values(this.errors)[0];
+        this.notify.show(first, 'error');
+        return;
+      }
     }
     if (this.step < 3) this.step++;
   }
@@ -122,10 +132,12 @@ export class CheckoutPage {
       .subscribe({
         next: () => {
           this.cartService.clear();
+          this.notify.show('Order placed successfully!', 'success');
           this.router.navigate(['/my-orders']);
         },
-        error: () => {
+        error: (err) => {
           this.isPlacingOrder = false;
+          this.notify.show(err.error?.message ?? 'Failed to place order. Please try again.', 'error');
         }
       });
   }
