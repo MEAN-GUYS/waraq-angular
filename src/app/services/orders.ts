@@ -42,7 +42,7 @@ export default class OrdersService {
   }
 
   getAllOrders(): Observable<{ results: Order[] }> {
-    return this.http.get<{ results: Order[] }>(`${this.apiUrl}/orders/all`);
+    return this.http.get<{ results: Order[] }>(`${this.apiUrl}/orders/all?limit=100`);
   }
 
   updateOrderStatus(id: string, body: { shippingStatus?: string; paymentStatus?: string }): Observable<Order> {
