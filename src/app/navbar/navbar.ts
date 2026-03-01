@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { map } from 'rxjs';
 import { AuthService } from '../services/auth-service';
-import { CartService } from '../services/cart.service';
+import { CartService } from '../services/cart';
 import { User } from '../models/registration';
 
 @Component({
@@ -15,7 +15,7 @@ import { User } from '../models/registration';
 })
 export class NavbarComponent {
   readonly authService = inject(AuthService);
-  private readonly cartService = inject(CartService);
+  readonly cartService = inject(CartService);
   private readonly router = inject(Router);
 
   readonly isLoggedIn$ = this.authService.isLoggedIn$;
@@ -23,13 +23,17 @@ export class NavbarComponent {
     map((loggedIn): User | null => (loggedIn ? this.authService.getUser() : null))
   );
   readonly isAdmin$ = this.user$.pipe(map(user => user?.role === 'admin'));
-  readonly cartCount$ = this.cartService.count$;
+
+  menuOpen = false;
+
+  toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
 
   logout(): void {
     this.authService.logout().subscribe({
       next: () => this.router.navigate(['/login']),
       error: () => {
-        // Even if the API call fails, clear local tokens and redirect
         this.authService.clearTokens();
         this.router.navigate(['/login']);
       },

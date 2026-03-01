@@ -1,11 +1,10 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CartService, CartItem } from '../../services/cart.service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { CartService, CartItem } from '../../services/cart';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-checkout-page',
@@ -14,13 +13,10 @@ import { Observable } from 'rxjs';
   templateUrl: './checkout-page.html',
   styleUrls: ['./checkout-page.css']
 })
-export class CheckoutPage implements OnInit {
+export class CheckoutPage {
   private router = inject(Router);
   private http = inject(HttpClient);
   cartService = inject(CartService);
-
-  items$: Observable<CartItem[]> = this.cartService.items$;
-  currentItems: CartItem[] = [];
 
   step = 1;
   isPlacingOrder = false;
@@ -46,6 +42,7 @@ export class CheckoutPage implements OnInit {
   };
 
   promoCode = '';
+  errors: Record<string, string> = {};
 
   validPromos: Record<string, number> = {
     'WARAQ10': 10,
@@ -53,14 +50,12 @@ export class CheckoutPage implements OnInit {
     'READ15': 15
   };
 
-  ngOnInit() {
-    this.cartService.items$.subscribe(items => {
-      this.currentItems = items;
-    });
+  get currentItems(): CartItem[] {
+    return this.cartService.items();
   }
 
   get subtotal() {
-    return this.currentItems.reduce((sum, item: any) => sum + (item.price || 0) * item.quantity, 0);
+    return this.currentItems.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
   }
 
   get discountAmount() {
@@ -85,18 +80,29 @@ export class CheckoutPage implements OnInit {
   }
 
   nextStep() {
+    this.errors = {};
+    if (this.step === 1) {
+      if (!this.address.fullName.trim()) this.errors['fullName'] = 'Full name is required';
+      if (!this.address.street.trim()) this.errors['street'] = 'Street address is required';
+      if (!this.address.city.trim()) this.errors['city'] = 'City is required';
+      if (!this.address.country.trim()) this.errors['country'] = 'Country is required';
+      if (!this.address.phone.trim()) this.errors['phone'] = 'Phone number is required';
+      if (Object.keys(this.errors).length) return;
+    }
+    if (this.step === 2 && this.paymentMethod === 'card') {
+      const num = this.card.number.replace(/\s/g, '');
+      if (num.length < 16) this.errors['cardNumber'] = 'Enter a valid 16-digit card number';
+      if (!this.card.name.trim()) this.errors['cardName'] = 'Cardholder name is required';
+      if (!/^\d{2}\/\d{2}$/.test(this.card.expiry)) this.errors['expiry'] = 'Enter expiry as MM/YY';
+      if (!/^\d{3}$/.test(this.card.cvv)) this.errors['cvv'] = 'Enter a valid 3-digit CVV';
+      if (Object.keys(this.errors).length) return;
+    }
     if (this.step < 3) this.step++;
   }
 
   prevStep() {
+    this.errors = {};
     if (this.step > 1) this.step--;
-  }
-
-  private getHeaders(): { headers: HttpHeaders } {
-    const token = localStorage.getItem('access_token');
-    return {
-      headers: new HttpHeaders({ Authorization: `Bearer ${token}` })
-    };
   }
 
   placeOrder() {
@@ -112,7 +118,7 @@ export class CheckoutPage implements OnInit {
       paymentMethod: this.paymentMethod === 'cash' ? 'COD' : 'card',
     };
 
-    this.http.post(`${environment.apiUrl}/orders`, orderBody, this.getHeaders())
+    this.http.post(`${environment.apiUrl}/orders`, orderBody)
       .subscribe({
         next: () => {
           this.cartService.clear();

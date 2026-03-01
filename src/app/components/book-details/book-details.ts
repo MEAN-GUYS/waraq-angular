@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Book } from '../../models/books';
 import BooksService from '../../services/books';
@@ -23,6 +23,12 @@ export class BookDetails {
   reviews = signal<Review[]>([]);
   isAddingToCart = signal<boolean>(false);
 
+  inCart = computed(() => {
+    const book = this.bookState();
+    if (!book?.id) return false;
+    return this.cartService.items().some(i => i.book === book.id);
+  });
+
   ngOnInit(): void {
     const bookId = this.activatedRoute.snapshot.paramMap.get('id');
     if (bookId) {
@@ -42,14 +48,19 @@ export class BookDetails {
 
   onAddToCart(): void {
     const book = this.bookState();
-
     if (!book || !book.id || book.stock === 0 || this.isAddingToCart()) return;
 
     this.isAddingToCart.set(true);
-    this.cartService.addToCart(book.id, 1);
+    this.cartService.addToCart(book.id, 1, { name: book.name, price: book.price, cover: book.cover, stock: book.stock });
+    setTimeout(() => this.isAddingToCart.set(false), 500);
+  }
 
-    setTimeout(() => {
-      this.isAddingToCart.set(false);
-    }, 500);
+  onRemoveFromCart(): void {
+    const book = this.bookState();
+    if (!book || !book.id || this.isAddingToCart()) return;
+
+    this.isAddingToCart.set(true);
+    this.cartService.remove(book.id);
+    setTimeout(() => this.isAddingToCart.set(false), 300);
   }
 }

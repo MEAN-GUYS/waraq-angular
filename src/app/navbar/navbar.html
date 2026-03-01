@@ -6,15 +6,19 @@
     </a>
   </div>
 
-  <ul class="navbar-links">
-    <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
-    <li><a routerLink="/books" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">Books</a></li>
+  <button class="hamburger" (click)="toggleMenu()" [class.open]="menuOpen">
+    <span></span><span></span><span></span>
+  </button>
+
+  <ul class="navbar-links" [class.mobile-open]="menuOpen">
+    <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="menuOpen=false">Home</a></li>
+    <li><a routerLink="/books" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" (click)="menuOpen=false">Books</a></li>
     @if (isLoggedIn$ | async) {
-    <li><a routerLink="/my-orders" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">My Orders</a></li>
-    <li><a routerLink="/cart" routerLinkActive="active">Cart</a></li>
+    <li><a routerLink="/my-orders" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}" (click)="menuOpen=false">My Orders</a></li>
+    <li><a routerLink="/cart" routerLinkActive="active" (click)="menuOpen=false">Cart</a></li>
     }
     @if (isAdmin$ | async) {
-    <li><a routerLink="/admin" routerLinkActive="active">Admin</a></li>
+    <li><a routerLink="/admin" routerLinkActive="active" (click)="menuOpen=false">Admin</a></li>
     }
   </ul>
 
@@ -22,7 +26,7 @@
     @if (isLoggedIn$ | async) {
     <a class="cart-icon" routerLink="/cart" aria-label="Cart">
       🛒
-      @if (cartCount$ | async; as count) {
+      @if (cartService.itemCount(); as count) {
       <span class="cart-badge">{{ count }}</span>
       }
     </a>

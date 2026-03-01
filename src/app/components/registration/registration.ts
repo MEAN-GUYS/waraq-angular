@@ -18,6 +18,7 @@ export class Registration {
   submitted = false;
   loading = false;
   errorMessage = '';
+  today = new Date().toISOString().split('T')[0];
 
   constructor(
     private fb: FormBuilder,

@@ -1,5 +1,58 @@
-<section class="page">
-  <h1>Cart</h1>
-  <p>Your cart will appear here.</p>
-</section>
+<div class="page">
+  <h1 class="text-2xl font-bold text-[#1a1a1a] mb-6">Your Cart</h1>
 
+  @if (cartService.items().length === 0) {
+    <div class="empty-cart">
+      <p class="text-[#8a8680] text-lg">Your cart is empty.</p>
+      <a routerLink="/books" class="mt-4 inline-block rounded-full bg-[#1d2e50] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[#c9a84c] hover:text-[#0d1b35] transition">
+        Browse Books
+      </a>
+    </div>
+  } @else {
+    <div class="cart-layout">
+      <!-- Items list -->
+      <div class="cart-items">
+        @for (item of cartService.items(); track item.book) {
+          <div class="cart-item">
+            <div class="item-cover">
+              @if (item.cover) {
+                <img [src]="item.cover" [alt]="item.name" class="h-[100px] w-[70px] object-contain rounded" />
+              } @else {
+                <div class="h-[100px] w-[70px] bg-gray-100 rounded flex items-center justify-center text-2xl">📖</div>
+              }
+            </div>
+            <div class="item-details">
+              <p class="item-name">{{ item.name }}</p>
+              <p class="item-price">${{ item.price.toFixed(2) }}</p>
+            </div>
+            <div class="item-quantity">
+              <button (click)="cartService.decrease(item.book)" [disabled]="item.quantity <= 1" class="qty-btn">−</button>
+              <span class="qty-value">{{ item.quantity }}</span>
+              <button (click)="cartService.increase(item.book)" [disabled]="item.quantity >= item.stock" class="qty-btn">+</button>
+            </div>
+            <div class="item-total">
+              <p class="font-semibold">${{ (item.price * item.quantity).toFixed(2) }}</p>
+            </div>
+            <button (click)="cartService.remove(item.book)" class="remove-btn" title="Remove">✕</button>
+          </div>
+        }
+      </div>
+
+      <!-- Summary -->
+      <div class="cart-summary">
+        <h2 class="text-lg font-bold text-[#1a1a1a] mb-4">Order Summary</h2>
+        <div class="summary-row">
+          <span>Items ({{ cartService.itemCount() }})</span>
+          <span>${{ cartService.getSubtotal().toFixed(2) }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>${{ cartService.getSubtotal().toFixed(2) }}</span>
+        </div>
+        <a routerLink="/checkout" class="checkout-btn">
+          Proceed to Checkout
+        </a>
+      </div>
+    </div>
+  }
+</div>

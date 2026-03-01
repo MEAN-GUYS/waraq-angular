@@ -1,6 +1,11 @@
 <a [routerLink]="['/books', book().id]" class="rounded-xl flex flex-col overflow-hidden bg-gray-50 cursor-pointer border border-transparent transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:z-10 hover:border-amber-200">
-  <div class="h-64 shrink-0">
+  <div class="h-64 shrink-0 relative">
     <img [src]="book().cover" [alt]="book().name" class="h-full w-full object-cover" />
+    @if (book().averageRating) {
+      <span class="absolute bottom-2 left-2 bg-black/60 text-white text-xs font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+        <span class="text-amber-400">★</span> {{ book().averageRating!.toFixed(1) }}
+      </span>
+    }
   </div>
   <div class="flex items-center justify-between p-3">
     <h2 class="text-gray-800 font-bold text-base leading-5 overflow-hidden line-clamp-2 flex-1 mr-2">{{ book().name }}</h2>

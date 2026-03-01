@@ -97,11 +97,15 @@ export class AdminPage implements OnInit {
   users = signal<User[]>([]);
   orders = signal<Order[]>([]);
 
-  // Orders pagination
+  // Orders pagination & sorting
   ordersPage = 1;
   ordersLimit = 10;
   ordersTotalPages = 1;
   ordersTotalResults = 0;
+  ordersSortBy = 'createdAt:desc';
+
+  // Mobile sidebar
+  sidebarOpen = false;
 
   // Feedback
   notification: { message: string, type: 'success' | 'error' | null } = { message: '', type: null };
@@ -170,7 +174,7 @@ export class AdminPage implements OnInit {
   }
 
   loadOrders(): void {
-    this.orderService.getAllOrders({ page: this.ordersPage, limit: this.ordersLimit }).subscribe({
+    this.orderService.getAllOrders({ page: this.ordersPage, limit: this.ordersLimit, sortBy: this.ordersSortBy }).subscribe({
       next: res => {
         this.orders.set(res.results);
         this.ordersTotalPages = res.totalPages;

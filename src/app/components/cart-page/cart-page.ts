@@ -1,12 +1,14 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, DestroyRef, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { filter } from 'rxjs';
 import { AuthService } from '../../services/auth-service';
+import { CartService } from '../../services/cart';
 
 @Component({
   selector: 'app-cart-page',
+  imports: [RouterLink],
   templateUrl: './cart-page.html',
   styleUrl: './cart-page.css',
 })
@@ -15,6 +17,7 @@ export class CartPage implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  readonly cartService = inject(CartService);
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;

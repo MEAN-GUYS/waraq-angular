@@ -214,29 +214,32 @@
     </div>
   </div>
 
+  <!-- Mobile sidebar toggle -->
+  <button class="sidebar-toggle" (click)="sidebarOpen = !sidebarOpen">&#9776;</button>
+
   <!-- Sidebar -->
-  <aside class="sidebar">
+  <aside class="sidebar" [class.mobile-open]="sidebarOpen">
     <div class="sidebar-header">
       <h2 class="admin-panel-title">ADMIN PANEL</h2>
     </div>
     <nav class="sidebar-nav">
       <ul>
-        <li [class.active]="currentView === 'dashboard'" (click)="setView('dashboard')">
+        <li [class.active]="currentView === 'dashboard'" (click)="setView('dashboard'); sidebarOpen = false">
           <span class="icon">&#128202;</span> Dashboard
         </li>
-        <li [class.active]="currentView === 'books'" (click)="setView('books')">
+        <li [class.active]="currentView === 'books'" (click)="setView('books'); sidebarOpen = false">
           <span class="icon">&#128218;</span> Books
         </li>
-        <li [class.active]="currentView === 'authors'" (click)="setView('authors')">
+        <li [class.active]="currentView === 'authors'" (click)="setView('authors'); sidebarOpen = false">
           <span class="icon">&#9997;&#65039;</span> Authors
         </li>
-        <li [class.active]="currentView === 'categories'" (click)="setView('categories')">
+        <li [class.active]="currentView === 'categories'" (click)="setView('categories'); sidebarOpen = false">
           <span class="icon">&#128278;</span> Categories
         </li>
-        <li [class.active]="currentView === 'users'" (click)="setView('users')">
+        <li [class.active]="currentView === 'users'" (click)="setView('users'); sidebarOpen = false">
           <span class="icon">&#128101;</span> Users
         </li>
-        <li [class.active]="currentView === 'orders'" (click)="setView('orders')">
+        <li [class.active]="currentView === 'orders'" (click)="setView('orders'); sidebarOpen = false">
           <span class="icon">&#128230;</span> Orders
         </li>
       </ul>
@@ -401,6 +404,12 @@
     <section *ngIf="currentView === 'orders'" class="management-view">
       <header class="section-header">
         <h2>Orders Management</h2>
+        <select class="form-input" style="width:auto" [(ngModel)]="ordersSortBy" (ngModelChange)="ordersPage=1; loadOrders()">
+          <option value="createdAt:desc">Newest First</option>
+          <option value="createdAt:asc">Oldest First</option>
+          <option value="totalPrice:desc">Highest Price</option>
+          <option value="totalPrice:asc">Lowest Price</option>
+        </select>
       </header>
       <table class="admin-table">
         <thead>

@@ -38,14 +38,15 @@ export default class OrdersService {
   constructor(private http: HttpClient) {}
 
   getOrders(): Observable<{ results: Order[] }> {
-    return this.http.get<{ results: Order[] }>(`${this.apiUrl}/orders/myorders`);
+    return this.http.get<{ results: Order[] }>(`${this.apiUrl}/orders/myorders?sortBy=createdAt:desc`);
   }
 
-  getAllOrders(params?: { page?: number; limit?: number }): Observable<{ results: Order[]; page: number; totalPages: number; totalResults: number }> {
+  getAllOrders(params?: { page?: number; limit?: number; sortBy?: string }): Observable<{ results: Order[]; page: number; totalPages: number; totalResults: number }> {
     let url = `${this.apiUrl}/orders/all`;
     const queryParts: string[] = [];
     if (params?.page) queryParts.push(`page=${params.page}`);
     if (params?.limit) queryParts.push(`limit=${params.limit}`);
+    if (params?.sortBy) queryParts.push(`sortBy=${params.sortBy}`);
     if (queryParts.length) url += '?' + queryParts.join('&');
     return this.http.get<{ results: Order[]; page: number; totalPages: number; totalResults: number }>(url);
   }

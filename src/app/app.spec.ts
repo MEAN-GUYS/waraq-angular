@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { App } from './app';
 import { AuthService } from './services/auth-service';
-import { CartService } from './services/cart.service';
+import { CartService } from './services/cart';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -23,7 +23,8 @@ describe('App', () => {
         {
           provide: CartService,
           useValue: {
-            count$: of(0),
+            items: () => [],
+            itemCount: () => 0,
           },
         },
       ],
