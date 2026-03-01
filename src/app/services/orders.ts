@@ -41,8 +41,13 @@ export default class OrdersService {
     return this.http.get<{ results: Order[] }>(`${this.apiUrl}/orders/myorders`);
   }
 
-  getAllOrders(): Observable<{ results: Order[] }> {
-    return this.http.get<{ results: Order[] }>(`${this.apiUrl}/orders/all?limit=100`);
+  getAllOrders(params?: { page?: number; limit?: number }): Observable<{ results: Order[]; page: number; totalPages: number; totalResults: number }> {
+    let url = `${this.apiUrl}/orders/all`;
+    const queryParts: string[] = [];
+    if (params?.page) queryParts.push(`page=${params.page}`);
+    if (params?.limit) queryParts.push(`limit=${params.limit}`);
+    if (queryParts.length) url += '?' + queryParts.join('&');
+    return this.http.get<{ results: Order[]; page: number; totalPages: number; totalResults: number }>(url);
   }
 
   updateOrderStatus(id: string, body: { shippingStatus?: string; paymentStatus?: string }): Observable<Order> {

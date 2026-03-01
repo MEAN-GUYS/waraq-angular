@@ -97,6 +97,12 @@ export class AdminPage implements OnInit {
   users = signal<User[]>([]);
   orders = signal<Order[]>([]);
 
+  // Orders pagination
+  ordersPage = 1;
+  ordersLimit = 10;
+  ordersTotalPages = 1;
+  ordersTotalResults = 0;
+
   // Feedback
   notification: { message: string, type: 'success' | 'error' | null } = { message: '', type: null };
   notificationTimeoutId?: number;
@@ -164,13 +170,23 @@ export class AdminPage implements OnInit {
   }
 
   loadOrders(): void {
-    this.orderService.getAllOrders().subscribe({
-      next: res => this.orders.set(res.results),
+    this.orderService.getAllOrders({ page: this.ordersPage, limit: this.ordersLimit }).subscribe({
+      next: res => {
+        this.orders.set(res.results);
+        this.ordersTotalPages = res.totalPages;
+        this.ordersTotalResults = res.totalResults;
+      },
       error: () => {
         this.orders.set([]);
         this.showNotification('Failed to load orders');
       }
     });
+  }
+
+  goToOrdersPage(page: number): void {
+    if (page < 1 || page > this.ordersTotalPages) return;
+    this.ordersPage = page;
+    this.loadOrders();
   }
 
   setView(view: typeof this.currentView): void {

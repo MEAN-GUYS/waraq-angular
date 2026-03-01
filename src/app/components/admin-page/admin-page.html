@@ -428,6 +428,11 @@
           </tr>
         </tbody>
       </table>
+      <div class="pagination" *ngIf="ordersTotalPages > 1">
+        <button class="btn-secondary" (click)="goToOrdersPage(ordersPage - 1)" [disabled]="ordersPage === 1">Previous</button>
+        <span class="page-info">Page {{ ordersPage }} of {{ ordersTotalPages }} ({{ ordersTotalResults }} orders)</span>
+        <button class="btn-secondary" (click)="goToOrdersPage(ordersPage + 1)" [disabled]="ordersPage === ordersTotalPages">Next</button>
+      </div>
     </section>
 
     <!-- Users Management View -->

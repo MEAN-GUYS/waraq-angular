@@ -558,3 +558,16 @@ select.form-input {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.page-info {
+  font-size: 0.875rem;
+  color: #64748b;
+}
