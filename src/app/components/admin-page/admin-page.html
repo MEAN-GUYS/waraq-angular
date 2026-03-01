@@ -342,6 +342,11 @@
           </tr>
         </tbody>
       </table>
+      <div class="pagination" *ngIf="booksTotalPages > 1">
+        <button class="btn-secondary" (click)="goToBooksPage(booksPage - 1)" [disabled]="booksPage === 1">Previous</button>
+        <span class="page-info">Page {{ booksPage }} of {{ booksTotalPages }} ({{ booksTotalResults }} books)</span>
+        <button class="btn-secondary" (click)="goToBooksPage(booksPage + 1)" [disabled]="booksPage === booksTotalPages">Next</button>
+      </div>
     </section>
 
     <!-- Authors Management View -->
@@ -371,6 +376,11 @@
           </tr>
         </tbody>
       </table>
+      <div class="pagination" *ngIf="authorsTotalPages > 1">
+        <button class="btn-secondary" (click)="goToAuthorsPage(authorsPage - 1)" [disabled]="authorsPage === 1">Previous</button>
+        <span class="page-info">Page {{ authorsPage }} of {{ authorsTotalPages }} ({{ authorsTotalResults }} authors)</span>
+        <button class="btn-secondary" (click)="goToAuthorsPage(authorsPage + 1)" [disabled]="authorsPage === authorsTotalPages">Next</button>
+      </div>
     </section>
 
     <!-- Categories Management View -->
@@ -398,6 +408,11 @@
           </tr>
         </tbody>
       </table>
+      <div class="pagination" *ngIf="categoriesTotalPages > 1">
+        <button class="btn-secondary" (click)="goToCategoriesPage(categoriesPage - 1)" [disabled]="categoriesPage === 1">Previous</button>
+        <span class="page-info">Page {{ categoriesPage }} of {{ categoriesTotalPages }} ({{ categoriesTotalResults }} categories)</span>
+        <button class="btn-secondary" (click)="goToCategoriesPage(categoriesPage + 1)" [disabled]="categoriesPage === categoriesTotalPages">Next</button>
+      </div>
     </section>
 
     <!-- Orders Management View -->
@@ -474,6 +489,11 @@
           </tr>
         </tbody>
       </table>
+      <div class="pagination" *ngIf="usersTotalPages > 1">
+        <button class="btn-secondary" (click)="goToUsersPage(usersPage - 1)" [disabled]="usersPage === 1">Previous</button>
+        <span class="page-info">Page {{ usersPage }} of {{ usersTotalPages }} ({{ usersTotalResults }} users)</span>
+        <button class="btn-secondary" (click)="goToUsersPage(usersPage + 1)" [disabled]="usersPage === usersTotalPages">Next</button>
+      </div>
     </section>
 
   </main>

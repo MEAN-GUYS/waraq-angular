@@ -5,7 +5,7 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../services/auth-service';
 import { Router } from '@angular/router';
 
-const AUTH_PATHS = ['/auth/login', '/auth/register', '/auth/refresh-tokens'];
+const AUTH_PATHS = ['/auth/login', '/auth/register', '/auth/refresh-tokens', '/auth/forget-password', '/auth/reset-password'];
 
 export const authInterceptor: HttpInterceptorFn = (
     req: HttpRequest<unknown>,
@@ -31,12 +31,15 @@ export const authInterceptor: HttpInterceptorFn = (
     return next(authReq).pipe(
         catchError((error: HttpErrorResponse) => {
             if (error.status === 401 && isBrowser) {
+                const currentUrl = router.url;
+                const publicPages = ['/forgot-password', '/reset-password', '/login', '/register'];
+                const isOnPublicPage = publicPages.some(p => currentUrl.startsWith(p));
+
                 const refreshToken = authService.getRefreshToken();
 
                 if (!refreshToken) {
-                    // no refresh token - clear auth and redirect
                     authService.clearTokens();
-                    router.navigate(['/login']);
+                    if (!isOnPublicPage) router.navigate(['/login']);
                     return throwError(() => error);
                 }
 
@@ -49,7 +52,7 @@ export const authInterceptor: HttpInterceptorFn = (
                     }),
                     catchError((refreshErr) => {
                         authService.clearTokens();
-                        router.navigate(['/login']);
+                        if (!isOnPublicPage) router.navigate(['/login']);
                         return throwError(() => refreshErr);
                     })
                 );

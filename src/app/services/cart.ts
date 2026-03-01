@@ -23,7 +23,7 @@ export class CartService {
   itemCount = computed(() => this.items().reduce((sum, item) => sum + item.quantity, 0));
 
   constructor(private http: HttpClient) {
-    if (this.isBrowser) {
+    if (this.isBrowser && localStorage.getItem('access_token')) {
       this.loadCart();
     }
   }

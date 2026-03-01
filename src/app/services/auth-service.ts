@@ -67,6 +67,14 @@ export class AuthService {
       );
   }
 
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.AUTH_URL}/forget-password`, { email });
+  }
+
+  resetPassword(token: string, password: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.AUTH_URL}/reset-password`, { token, password });
+  }
+
   refreshTokens(): Observable<AuthResponse> {
     const refreshToken = this.getRefreshToken();
     if (!refreshToken) {

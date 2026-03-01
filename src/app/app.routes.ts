@@ -11,6 +11,8 @@ import { noAuthGuard } from './guards/no-auth.guard';
 import { userGuard, adminGuard } from './guards/role.guard';
 import { CheckoutPage } from './components/checkout-page/checkout-page';
 import { NotFoundComponent } from './components/not-found/not-found';
+import { ForgotPassword } from './components/forgot-password/forgot-password';
+import { ResetPassword } from './components/reset-password/reset-password';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
@@ -21,6 +23,8 @@ export const routes: Routes = [
   { path: "admin", component: AdminPage, canActivate: [adminGuard] },
   { path: "register", component: Registration, canActivate: [noAuthGuard] },
   { path: "login", component: Login, canActivate: [noAuthGuard] },
+  { path: 'forgot-password', component: ForgotPassword },
+  { path: 'reset-password', component: ResetPassword },
   { path: 'checkout', component: CheckoutPage, canActivate: [userGuard] },
   { path: '**', component: NotFoundComponent }
 ];

@@ -97,6 +97,30 @@ export class AdminPage implements OnInit {
   users = signal<User[]>([]);
   orders = signal<Order[]>([]);
 
+  // Books pagination
+  booksPage = 1;
+  booksLimit = 10;
+  booksTotalPages = 1;
+  booksTotalResults = 0;
+
+  // Authors pagination
+  authorsPage = 1;
+  authorsLimit = 10;
+  authorsTotalPages = 1;
+  authorsTotalResults = 0;
+
+  // Categories pagination
+  categoriesPage = 1;
+  categoriesLimit = 10;
+  categoriesTotalPages = 1;
+  categoriesTotalResults = 0;
+
+  // Users pagination
+  usersPage = 1;
+  usersLimit = 10;
+  usersTotalPages = 1;
+  usersTotalResults = 0;
+
   // Orders pagination & sorting
   ordersPage = 1;
   ordersLimit = 10;
@@ -134,8 +158,12 @@ export class AdminPage implements OnInit {
   }
 
   loadBooks(): void {
-    this.bookService.getBooks({ limit: 50 }).subscribe({
-      next: res => this.books = res.results,
+    this.bookService.getBooks({ page: this.booksPage, limit: this.booksLimit }).subscribe({
+      next: res => {
+        this.books = res.results;
+        this.booksTotalPages = res.totalPages;
+        this.booksTotalResults = res.totalResults;
+      },
       error: () => {
         this.books = [];
         this.showNotification('Failed to load books');
@@ -144,8 +172,12 @@ export class AdminPage implements OnInit {
   }
 
   loadAuthors(): void {
-    this.authorService.getAuthors({ limit: 50 }).subscribe({
-      next: res => this.authors = res.results,
+    this.authorService.getAuthors({ page: this.authorsPage, limit: this.authorsLimit }).subscribe({
+      next: res => {
+        this.authors = res.results;
+        this.authorsTotalPages = res.totalPages;
+        this.authorsTotalResults = res.totalResults;
+      },
       error: () => {
         this.authors = [];
         this.showNotification('Failed to load authors');
@@ -154,8 +186,12 @@ export class AdminPage implements OnInit {
   }
 
   loadCategories(): void {
-    this.categoryService.getCategories({ limit: 50 }).subscribe({
-      next: res => this.categories = res.results,
+    this.categoryService.getCategories({ page: this.categoriesPage, limit: this.categoriesLimit }).subscribe({
+      next: res => {
+        this.categories = res.results;
+        this.categoriesTotalPages = res.totalPages;
+        this.categoriesTotalResults = res.totalResults;
+      },
       error: () => {
         this.categories = [];
         this.showNotification('Failed to load categories');
@@ -164,8 +200,12 @@ export class AdminPage implements OnInit {
   }
 
   loadUsers(): void {
-    this.userService.getUsers({ limit: 50 }).subscribe({
-      next: res => this.users.set(res.results),
+    this.userService.getUsers({ page: this.usersPage, limit: this.usersLimit }).subscribe({
+      next: res => {
+        this.users.set(res.results);
+        this.usersTotalPages = res.totalPages;
+        this.usersTotalResults = res.totalResults;
+      },
       error: () => {
         this.users.set([]);
         this.showNotification('Failed to load users');
@@ -185,6 +225,30 @@ export class AdminPage implements OnInit {
         this.showNotification('Failed to load orders');
       }
     });
+  }
+
+  goToBooksPage(page: number): void {
+    if (page < 1 || page > this.booksTotalPages) return;
+    this.booksPage = page;
+    this.loadBooks();
+  }
+
+  goToAuthorsPage(page: number): void {
+    if (page < 1 || page > this.authorsTotalPages) return;
+    this.authorsPage = page;
+    this.loadAuthors();
+  }
+
+  goToCategoriesPage(page: number): void {
+    if (page < 1 || page > this.categoriesTotalPages) return;
+    this.categoriesPage = page;
+    this.loadCategories();
+  }
+
+  goToUsersPage(page: number): void {
+    if (page < 1 || page > this.usersTotalPages) return;
+    this.usersPage = page;
+    this.loadUsers();
   }
 
   goToOrdersPage(page: number): void {
