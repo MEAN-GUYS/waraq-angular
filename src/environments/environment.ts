@@ -1,3 +1,3 @@
 export const environment = {
-    apiUrl: 'https://waraq-api-production.up.railway.app/v1'
+    apiUrl: 'https://waraq-api-production-9e06.up.railway.app/v1'
 };
